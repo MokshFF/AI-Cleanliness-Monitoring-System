@@ -207,3 +207,44 @@ The system supports configurable ROIs (bounding boxes or arbitrary polygons). Th
   - Once confirmed, an incident enters a 180s cooldown window to suppress repeat alerts. Repeated violations after cooldown expiration generate distinct subsequent incidents.
 - **Evidence Snapshots**:
   - Saved into date-partitioned storage (`storage/snapshots/YYYY/MM/DD/INC-...jpg`) with high-resolution bounding boxes, polygonal overlays, confidence tags, and metadata banners.
+
+---
+
+## 9. MongoDB Persistence, FastAPI REST API & Authentication (Phase 6)
+
+```
+[ IncidentEngine.on_incident(...) ]
+                │
+                ▼
+[ IncidentPersistenceService ] ──▶ Resilient Async Persistence Task
+                │
+                ▼
+      [ MongoDB Database ]
+       ├── users (Indexed: username, email)
+       ├── cameras (Indexed: camera_id, is_active)
+       ├── incidents (Indexed: incident_id, camera_id, timestamp, status, severity)
+       └── audit_logs (Indexed: timestamp, user_id, action)
+                │
+                ▲
+                │ (CRUD + Aggregation + Auditing)
+                │
+     [ FastAPI REST API (v1) ]
+       ├── /api/v1/auth: POST /login, GET /me (JWT Bearer Token)
+       ├── /api/v1/users: Admin-only CRUD + RBAC
+       ├── /api/v1/cameras: Stream Registry, Credential Masking
+       └── /api/v1/incidents: Paginated Search, Multi-Filter, Status Updates
+```
+
+### 9.1 Database Persistence Architecture
+- **Motor Asynchronous Driver**: Non-blocking async I/O using `motor.motor_asyncio.AsyncIOMotorClient` with connection pooling (`minPoolSize=5`, `maxPoolSize=50`).
+- **Resilient Engine Bridge**: `IncidentPersistenceService` attaches directly to Phase 5 `IncidentEngine.on_incident` callbacks. Persists incidents to MongoDB across thread/async boundaries without ever stalling camera worker threads on network or database failures.
+- **Indexes**: Idempotent startup index creation covering primary keys, search attributes, temporal orderings (`timestamp: -1`), and composite filter combinations (`camera_id + timestamp`, `status + timestamp`, `severity + timestamp`).
+
+### 9.2 Security & RBAC Enforcement
+- **Password Security**: Passwords hashed using `bcrypt` with unique salts. Password hashes are strictly omitted from schema serialization (`UserResponse`).
+- **JWT Authentication**: HS256 signed access tokens with configurable expiration (`JWT_ACCESS_TOKEN_EXPIRE_MINUTES`).
+- **Role-Based Access Control (RBAC)**:
+  - `ADMIN`: Full access to user management, camera registration/modification/deletion, incident lifecycle management, and audit logs.
+  - `OPERATOR`: Access to camera inspection, incident querying, and status progression (`NEW` ➔ `ACKNOWLEDGED` ➔ `RESOLVED` / `DISMISSED`). Restricted from user administration and camera modification.
+- **RTSP Credential Protection**: Passwords in RTSP URLs are automatically masked across all API responses (`rtsp://user:***@host:port/path`) using schema-level validators and repository sanitation.
+- **Audit Logging**: All sensitive mutations (user creation, camera modification, incident acknowledgement) record user, timestamp, client IP, action, and redacted metadata in `audit_logs`.

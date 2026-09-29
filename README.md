@@ -17,7 +17,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 3: Liquid Waste Dataset & Segmentation Pipeline**
 - [x] **Phase 4: Real CCTV / RTSP Video Ingestion + Multi-Camera Pipeline**
 - [x] **Phase 5: Object Tracking + Temporal Persistence + Incident Engine**
-- [ ] **Phase 6: FastAPI + MongoDB Backend**
+- [x] **Phase 6: MongoDB Persistence + FastAPI REST API + Authentication**
 - [ ] **Phase 7: React Admin Web Dashboard**
 - [ ] **Phase 8: WebSocket Real-Time Alerts**
 - [ ] **Phase 9: Camera Management, Maps & Analytics**
@@ -61,9 +61,35 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 
 ---
 
+## Backend Persistence & REST API (Phase 6)
+
+### 1. Features
+- **Async Motor MongoDB Persistence**: Repositories for Users, Cameras, Incidents, and Audit Logs.
+- **FastAPI REST API (v1)**:
+  - `/api/v1/auth/login`, `/api/v1/auth/me`: JWT Bearer authentication.
+  - `/api/v1/users`: Admin-only user management with RBAC enforcement.
+  - `/api/v1/cameras`: CCTV camera stream registry with automatic RTSP credential masking (`rtsp://***:***@...`).
+  - `/api/v1/incidents`: Multi-field filtering (camera, status, severity, waste type, date range), pagination, and status updates (`NEW`, `ACKNOWLEDGED`, `RESOLVED`, `DISMISSED`).
+- **Incident Persistence Bridge**: `IncidentPersistenceService` connects Phase 5 `IncidentEngine.on_incident` directly to MongoDB without blocking camera capture threads.
+- **Audit Trails**: Non-repudiation audit logging for incident triage and camera modifications with sensitive token/password redaction.
+
+### 2. Admin Bootstrap Script
+Idempotently initializes the default administrator user:
+```bash
+python backend/scripts/create_admin.py
+```
+
+### 3. End-to-End Demonstration Script
+Runs a full end-to-end integration demo of admin login, operator creation, camera registration, incident engine callback persistence, incident querying, and status updates:
+```bash
+python backend/scripts/e2e_phase6_demo.py
+```
+
+---
+
 ## Running Automated Tests
 
-Run all 54 unit & integration tests across Phases 1 through 5:
+Run all 84 unit & integration tests across Phases 1 through 6:
 ```bash
 python -m pytest tests/ -v
 ```

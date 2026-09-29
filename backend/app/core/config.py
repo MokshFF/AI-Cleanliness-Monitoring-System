@@ -1,6 +1,6 @@
 """Core application configuration and environment settings."""
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Optional
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -39,7 +39,12 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "change_this_to_a_secure_random_secret_in_production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Initial Admin Bootstrap
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_EMAIL: str = "admin@cleanliness.gov.in"
+    ADMIN_PASSWORD: str = "ChangeMe@Admin2026"
     INITIAL_ADMIN_EMAIL: str = "admin@cleanliness.gov.in"
     INITIAL_ADMIN_PASSWORD: str = "ChangeMe@Admin2026"
     INITIAL_ADMIN_FULL_NAME: str = "National System Administrator"
@@ -47,8 +52,13 @@ class Settings(BaseSettings):
     # Database
     MONGODB_URI: str = "mongodb://localhost:27017"
     MONGODB_DB_NAME: str = "cleanliness_monitoring_db"
+    MONGODB_DATABASE: Optional[str] = None
     MONGODB_MIN_POOL_SIZE: int = 5
     MONGODB_MAX_POOL_SIZE: int = 50
+
+    @property
+    def database_name(self) -> str:
+        return self.MONGODB_DATABASE or self.MONGODB_DB_NAME
 
     # Storage
     STORAGE_BASE_DIR: Path = Path("./storage")
