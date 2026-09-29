@@ -1,0 +1,16 @@
+# ==============================================================================
+# YOLOv8 / YOLOv11 Solid Waste Dataset Configuration
+# ==============================================================================
+path: datasets/solid
+train: images/train
+val: images/val
+test: images/test
+
+# Classes taxonomy (derived strictly from ai/configs/solid_classes.yaml)
+names:
+  0: plastic_bottle
+  1: plastic_bag
+  2: paper
+  3: can
+  4: food_waste
+  5: garbage_pile

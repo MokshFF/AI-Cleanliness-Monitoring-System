@@ -1,0 +1,31 @@
+{
+  "model_name": "SolidWasteYOLO_yolov8n.pt",
+  "architecture": "yolov8n.pt",
+  "task": "detect",
+  "domain": "solid_waste",
+  "training_date": "2026-09-29T12:09:22.378385+00:00",
+  "duration_seconds": 11.440416,
+  "smoke_test": true,
+  "epochs": 1,
+  "imgsz": 160,
+  "batch_size": 2,
+  "device": "cpu",
+  "classes": {
+    "0": "plastic_bottle",
+    "1": "plastic_bag",
+    "2": "paper",
+    "3": "can",
+    "4": "food_waste",
+    "5": "garbage_pile"
+  },
+  "num_classes": 6,
+  "dataset_yaml": "datasets\\solid\\dataset.yaml",
+  "best_weight_path": "C:\\Users\\avars\\Downloads\\AI Based Cleanliness Monitoring System\\models\\solid\\best.pt",
+  "metrics": {
+    "metrics/precision(B)": 0.0,
+    "metrics/recall(B)": 0.0,
+    "metrics/mAP50(B)": 0.0,
+    "metrics/mAP50-95(B)": 0.0,
+    "fitness": 0.0
+  }
+}

@@ -49,6 +49,18 @@ ai/models/weights/*
 !ai/models/weights/.gitkeep
 ai/datasets/data/*
 !ai/datasets/data/.gitkeep
+ai/datasets/solid/images/*/*
+!ai/datasets/solid/images/*/.gitkeep
+ai/datasets/solid/labels/*/*
+!ai/datasets/solid/labels/*/.gitkeep
+ai/datasets/solid/raw/*
+!ai/datasets/solid/raw/.gitkeep
+/datasets/
+models/solid/runs/
+models/solid/evaluation/
+models/solid/*.pt
+models/solid/checkpoints/
+*.cache
 runs/
 wandb/
 
