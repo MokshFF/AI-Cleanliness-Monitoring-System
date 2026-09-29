@@ -1,0 +1,43 @@
+# ==============================================================================
+# AI-Based National Cleanliness Monitoring System - Python Dependencies
+# ==============================================================================
+
+# Core Framework & Settings
+pydantic>=2.10.0,<3.0.0
+pydantic-settings>=2.7.0,<3.0.0
+python-dotenv>=1.0.1
+pyyaml>=6.0.2
+
+# Backend & REST API
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.20
+
+# Security & Authentication
+pyjwt>=2.10.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0
+
+# Database
+pymongo>=4.10.0
+motor>=3.6.0
+
+# Computer Vision & Video Processing
+opencv-python>=4.10.0
+numpy>=1.26.0,<3.0.0
+pillow>=10.4.0
+
+# AI / Deep Learning (Ensure PyTorch installed with appropriate CUDA/CPU backend)
+torch>=2.4.0
+torchvision>=0.19.0
+ultralytics>=8.3.0
+supervision>=0.24.0
+
+# WebSockets & HTTP client
+websockets>=13.0
+httpx>=0.28.0
+
+# Testing & Quality Assurance
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+mongomock>=4.3.0

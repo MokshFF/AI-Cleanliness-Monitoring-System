@@ -1,0 +1,30 @@
+# ==============================================================================
+# Solid Waste Detection Classes
+# ==============================================================================
+task: detect
+domain: solid_waste
+version: "1.0.0"
+
+classes:
+  0: plastic_bottle
+  1: plastic_bag
+  2: paper
+  3: can
+  4: food_waste
+  5: garbage_pile
+
+class_names:
+  - plastic_bottle
+  - plastic_bag
+  - paper
+  - can
+  - food_waste
+  - garbage_pile
+
+severity_levels:
+  plastic_bottle: LOW
+  plastic_bag: LOW
+  paper: LOW
+  can: LOW
+  food_waste: MEDIUM
+  garbage_pile: HIGH

@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: cleanliness_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: cleanliness_monitoring_db
+
+  # Backend REST API + WebSocket Service
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: cleanliness_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=cleanliness_monitoring_db
+      - ENVIRONMENT=production
+    volumes:
+      - ../storage:/app/storage
+    depends_on:
+      - mongodb
+
+  # AI Detection & Video Stream Processing Engine
+  ai_worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ai
+    container_name: cleanliness_ai_worker
+    restart: always
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=cleanliness_monitoring_db
+    volumes:
+      - ../storage:/app/storage
+      - ../ai/models/weights:/app/ai/models/weights
+    depends_on:
+      - mongodb
+      - backend
+
+volumes:
+  mongodb_data:
+    driver: local

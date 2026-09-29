@@ -1,0 +1,29 @@
+# ==============================================================================
+# Liquid Waste Segmentation Classes
+# ==============================================================================
+task: segment
+domain: liquid_waste
+version: "1.0.0"
+
+classes:
+  0: liquid_spill
+  1: sewage_overflow
+  2: waterlogging
+  3: drain_overflow
+
+class_names:
+  - liquid_spill
+  - sewage_overflow
+  - waterlogging
+  - drain_overflow
+
+severity_levels:
+  liquid_spill: MEDIUM
+  sewage_overflow: HIGH
+  waterlogging: HIGH
+  drain_overflow: HIGH
+
+# Area evaluation thresholds (relative to frame dimensions or pixel counts)
+area_thresholds:
+  min_valid_pixel_area: 1200
+  critical_overflow_pixel_area: 15000

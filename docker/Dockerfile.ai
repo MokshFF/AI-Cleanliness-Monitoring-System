@@ -1,0 +1,29 @@
+# ==============================================================================
+# AI Worker / Video Processing Dockerfile
+# ==============================================================================
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
+
+# Install system dependencies for OpenCV and video codecs
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Run AI Video Stream Pipeline Worker
+CMD ["python", "-m", "ai.inference.pipeline"]
