@@ -1,0 +1,14 @@
+# ==============================================================================
+# YOLOv8 / YOLOv11 Liquid Waste Instance Segmentation Dataset Configuration
+# ==============================================================================
+path: datasets/liquid
+train: images/train
+val: images/val
+test: images/test
+
+# Classes taxonomy (derived strictly from ai/configs/liquid_classes.yaml)
+names:
+  0: liquid_spill
+  1: sewage_overflow
+  2: waterlogging
+  3: drain_overflow

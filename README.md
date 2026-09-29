@@ -14,7 +14,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 
 - [x] **Phase 1: Project Architecture & Repository Setup**
 - [x] **Phase 2: Solid Waste Dataset & YOLO Detection Pipeline**
-- [ ] **Phase 3: Liquid Waste Dataset & Segmentation Pipeline**
+- [x] **Phase 3: Liquid Waste Dataset & Segmentation Pipeline**
 - [ ] **Phase 4: Video Processing & RTSP Camera Integration**
 - [ ] **Phase 5: Tracking + Temporal Persistence + Incident Engine**
 - [ ] **Phase 6: FastAPI + MongoDB Backend**
@@ -25,57 +25,29 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 
 ---
 
-## Solid Waste Computer Vision Pipeline (Phase 2)
+## Computer Vision Pipelines
 
-### 1. Solid Waste Taxonomy (6 Classes)
-1. `plastic_bottle`
-2. `plastic_bag`
-3. `paper`
-4. `can`
-5. `food_waste`
-6. `garbage_pile`
+### 1. Solid Waste Detection (Phase 2)
+- **Classes**: `plastic_bottle`, `plastic_bag`, `paper`, `can`, `food_waste`, `garbage_pile`
+- **Validation**: `python ai/datasets/validator.py`
+- **Training**: `python -m ai.training.train_solid --smoke-test --epochs 1 --batch 2 --imgsz 160 --device cpu`
+- **Evaluation**: `python -m ai.training.evaluate_solid --model models/solid/best.pt --data datasets/solid/dataset.yaml --split val`
 
-### 2. Dataset Validation
-Audits YOLO annotation syntax, missing pairs, coordinate boundaries, empty files, and duplicates:
-```bash
-python ai/datasets/validator.py
-```
+### 2. Liquid Waste Segmentation & Affected-Area Analysis (Phase 3)
+- **Classes**: `liquid_spill`, `sewage_overflow`, `waterlogging`, `drain_overflow`
+- **Validation**: `python ai/datasets/liquid_validator.py`
+- **Training**: `python -m ai.training.train_liquid --data datasets/liquid/dataset.yaml --smoke-test --epochs 1 --batch 2 --imgsz 160 --device cpu`
+- **Evaluation**: `python -m ai.training.evaluate_liquid --model models/liquid/best.pt --data datasets/liquid/dataset.yaml --split val`
+- **Inference with ROI**:
+  ```python
+  from ai.inference.liquid_segmenter import LiquidWasteSegmenter
+  from ai.inference.schemas import RegionOfInterest, BoundingBox
 
-### 3. Training Pipeline
-Run a 1-epoch smoke-test on CPU/GPU:
-```bash
-python -m ai.training.train_solid --smoke-test --epochs 1 --batch 2 --imgsz 160 --device cpu
-```
-Full production training with CCTV-style augmentations:
-```bash
-python -m ai.training.train_solid --model yolov8s.pt --epochs 60 --batch 16 --imgsz 640 --device auto
-```
-
-### 4. Model Evaluation
-Computes Precision, Recall, F1, mAP@0.50, and mAP@0.50:0.95:
-```bash
-python -m ai.training.evaluate_solid --model models/solid/best.pt --data datasets/solid/dataset.yaml --split val
-```
-
-### 5. Structured Inference
-
-**Single Image:**
-```python
-from ai.inference.solid_detector import SolidWasteDetector
-
-detector = SolidWasteDetector(model_path="models/solid/best.pt", confidence_threshold=0.45)
-result, annotated_img = detector.detect_image("path/to/image.jpg")
-print(result.model_dump_json(indent=2))
-```
-
-**Video Stream:**
-```python
-results = detector.detect_video(
-    video_path="storage/test_videos/cctv_sample.mp4",
-    output_path="storage/test_videos/annotated_sample.mp4",
-    sample_rate=2
-)
-```
+  segmenter = LiquidWasteSegmenter(model_path="models/liquid/best.pt", confidence_threshold=0.40)
+  drain_roi = RegionOfInterest(name="drain_zone", bbox=BoundingBox(x1=50, y1=50, x2=450, y2=450))
+  result, annotated_img = segmenter.detect_image("path/to/frame.jpg", roi=drain_roi)
+  print(f"Affected Area: {result.total_affected_area_percent}% ({result.total_affected_liquid_pixels} px)")
+  ```
 
 ---
 

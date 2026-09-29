@@ -1,0 +1,33 @@
+{
+  "model_name": "LiquidWasteYOLO_yolov8n-seg.pt",
+  "architecture": "yolov8n-seg.pt",
+  "task": "segment",
+  "domain": "liquid_waste",
+  "training_date": "2026-09-29T17:35:39.283399+00:00",
+  "duration_seconds": 10.740114,
+  "smoke_test": true,
+  "epochs": 1,
+  "imgsz": 160,
+  "batch_size": 2,
+  "device": "cpu",
+  "classes": {
+    "0": "liquid_spill",
+    "1": "sewage_overflow",
+    "2": "waterlogging",
+    "3": "drain_overflow"
+  },
+  "num_classes": 4,
+  "dataset_yaml": "datasets\\liquid\\dataset.yaml",
+  "best_weight_path": "C:\\Users\\avars\\Downloads\\AI Based Cleanliness Monitoring System\\models\\liquid\\best.pt",
+  "metrics": {
+    "metrics/precision(B)": 0.0,
+    "metrics/recall(B)": 0.0,
+    "metrics/mAP50(B)": 0.0,
+    "metrics/mAP50-95(B)": 0.0,
+    "metrics/precision(M)": 0.0,
+    "metrics/recall(M)": 0.0,
+    "metrics/mAP50(M)": 0.0,
+    "metrics/mAP50-95(M)": 0.0,
+    "fitness": 0.0
+  }
+}

@@ -69,7 +69,6 @@ The **AI-Based National Cleanliness Monitoring System** is an automated surveill
 ---
 
 ## 4. Solid Waste Computer Vision Pipeline (Phase 2)
-
 ```
 [ Raw / Annotated Images ]
           │
@@ -96,50 +95,49 @@ The **AI-Based National Cleanliness Monitoring System** is an automated surveill
                                         Output: SolidFrameDetectionResult
 ```
 
-### Structured Inference Output Schema
-Inference emits typed JSON adhering to `ai.inference.schemas.SolidFrameDetectionResult`:
-```json
-{
-  "frame_index": 12,
-  "timestamp": "2026-09-29T12:12:04.879220Z",
-  "image_width": 1280,
-  "image_height": 720,
-  "detections": [
-    {
-      "class_id": 0,
-      "class_name": "plastic_bottle",
-      "confidence": 0.8924,
-      "bbox": {
-        "x1": 340.5,
-        "y1": 512.0,
-        "x2": 412.0,
-        "y2": 628.5
-      },
-      "normalized_bbox": {
-        "x1": 0.2660,
-        "y1": 0.7111,
-        "x2": 0.3218,
-        "y2": 0.8729
-      }
-    }
-  ],
-  "processing_time_ms": 14.82
-}
+---
+
+## 5. Liquid Waste Segmentation Pipeline (Phase 3)
+```
+[ Raw / Annotated Images ]
+          │
+          ▼
+[ ai/datasets/liquid_validator.py ] ──▶ Polygon vertex & coordinate bounds audit
+          │
+          ▼
+[ ai/datasets/splitter.py ]  ──▶ 70% Train, 20% Val, 10% Test (SHA-256 deduplicated)
+          │
+          ▼
+[ ai/configs/liquid_dataset.yaml ]
+          │
+          ▼
+[ ai/training/train_liquid.py ] ──▶ CCTV Augmentations (hsv reflection, perspective, scale)
+          │
+          ├──▶ models/liquid/best.pt & ai/models/weights/liquid_waste_yolo_seg.pt
+          └──▶ models/liquid/metadata.json
+          │
+          ▼
+[ ai/training/evaluate_liquid.py ] ──▶ Mask/Box mAP@0.50, mAP@0.50:0.95, Precision, Recall
+          │
+          ▼
+[ ai/inference/liquid_segmenter.py ] ──▶ Affected Area & ROI Calculation
+                                         Output: LiquidFrameDetectionResult
 ```
 
----
-
-## 5. CCTV-Specific Data Augmentation Strategy
-To mirror actual surveillance conditions without destroying the semantic meaning of litter classes:
-- **Color & Lighting Variation**: HSV hue (0.015), saturation (0.7), and value/brightness (0.4) simulate direct noon sun, twilight, rain, and nighttime sodium/LED lighting.
-- **Perspective & Spatial Jitter**: Subtle rotation (10.0 deg) and translation (0.10) capture pole oscillation and diagonal viewing angles.
-- **Scale Jitter (0.50)**: Objects appear small in the far-field (20m away) and larger near the camera.
-- **No Inversion**: Vertical flip is disabled (`flipud: 0.0`) because litter rests gravitationally on horizontal surfaces.
-- **Occlusion Resistance**: Random erasing and mixup (0.10) model partial occlusions by walking pedestrians.
+### Affected-Area Calculation & Monitored Region of Interest (ROI)
+Liquid hazard severity is determined by the percentage of a designated monitored zone covered:
+$$\text{affected\_area\_percent} = \frac{\text{affected\_liquid\_pixels}}{\text{monitored\_region\_pixels}} \times 100$$
+The system supports configurable ROIs (bounding boxes or arbitrary polygons). The binary mask of the segmented liquid is bitwise-ANDed with the ROI mask to compute only the relevant violation footprint.
 
 ---
 
-## 6. Multi-Camera Scalability & Concurrency
+## 6. CCTV-Specific Data Augmentation Strategy
+- **Solid Waste**: HSV lighting variations, moderate rotation (10.0°), scaling (0.50), no vertical flips (`flipud: 0.0`), pedestrian occlusion erasing.
+- **Liquid Waste**: Specular reflection & water saturation variations, oblique perspective (0.0008), curb/shadow occlusion, no vertical flips (`flipud: 0.0`).
+
+---
+
+## 7. Multi-Camera Scalability & Concurrency
 - **Stream Ingestion**: Lightweight worker threads drain camera RTSP streams into bounded ring buffers (`FRAME_BUFFER_MAXSIZE = 30`).
 - **Dynamic Modes**: Per-camera detection mode: `SOLID`, `LIQUID`, or `BOTH`.
 - **RTSP Isolation**: Raw RTSP credentials never reach web clients.
