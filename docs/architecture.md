@@ -137,7 +137,23 @@ The system supports configurable ROIs (bounding boxes or arbitrary polygons). Th
 
 ---
 
-## 7. Multi-Camera Scalability & Concurrency
-- **Stream Ingestion**: Lightweight worker threads drain camera RTSP streams into bounded ring buffers (`FRAME_BUFFER_MAXSIZE = 30`).
-- **Dynamic Modes**: Per-camera detection mode: `SOLID`, `LIQUID`, or `BOTH`.
-- **RTSP Isolation**: Raw RTSP credentials never reach web clients.
+## 7. Multi-Camera Video Ingestion & Stream Management (Phase 4)
+
+```
+[ Camera Sources ] ──▶ [ StreamCapture Thread ] ──▶ [ BoundedFrameBuffer ] ──▶ [ Processing Thread ] ──▶ [ AIRouter ]
+ (RTSP, File, Webcam)     - Auto-reconnect              - Maxsize: 30              - Target FPS Sampling   - SOLID / LIQUID / BOTH
+                           - Exponential backoff         - Oldest frame drop        - Timezone timestamps  - Evidence frame preserved
+```
+
+### 7.1 Architecture & Concurrency Isolation
+- **CameraWorker Isolation**: Each camera runs an isolated worker consisting of two coordinated threads:
+  1. `StreamCapture` thread: continuously drains frames from the network/device directly into memory to prevent network socket backpressure.
+  2. Consumer/Processing thread: samples frames at the camera's configured `target_fps` (e.g., 3-5 FPS from 25-30 FPS stream) and routes to AI models.
+- **Bounded Frame Buffer**: Fixed capacity (default 30 frames). When full, the oldest unconsumed frame is dropped, ensuring real-time latency is preserved and memory footprint is strictly bounded.
+- **Auto-Reconnect & Backoff**: Automatically detects frame decode failures and socket loss, triggering exponential backoff reconnection without blocking or crashing other camera workers.
+- **Credential Protection**: Redacts passwords from RTSP URLs (e.g. `rtsp://user:***@host:port/path`) in logs, telemetry, and error reports.
+- **AI Routing**: The `AIRouter` dispatches frames according to camera capability:
+  - `SOLID` ➔ `SolidWasteDetector` (YOLO detection)
+  - `LIQUID` ➔ `LiquidWasteSegmenter` (YOLO polygon segmentation & ROI analysis)
+  - `BOTH` ➔ Both models concurrently, merged into unified `CameraFrameAIResult`.
+- **Evidence Frame Preservation**: Every `CameraFrameAIResult` bundles the raw NumPy frame, ready for Phase 5 object tracking and snapshot evidence storage.
