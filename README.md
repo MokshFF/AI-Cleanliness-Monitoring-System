@@ -16,7 +16,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 2: Solid Waste Dataset & YOLO Detection Pipeline**
 - [x] **Phase 3: Liquid Waste Dataset & Segmentation Pipeline**
 - [x] **Phase 4: Real CCTV / RTSP Video Ingestion + Multi-Camera Pipeline**
-- [ ] **Phase 5: Tracking + Temporal Persistence + Incident Engine**
+- [x] **Phase 5: Object Tracking + Temporal Persistence + Incident Engine**
 - [ ] **Phase 6: FastAPI + MongoDB Backend**
 - [ ] **Phase 7: React Admin Web Dashboard**
 - [ ] **Phase 8: WebSocket Real-Time Alerts**
@@ -49,11 +49,21 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
   python video/e2e_pipeline.py
   ```
 
+### 4. Object Tracking & Incident Engine (Phase 5)
+- **ByteTrack Multi-Object Tracking**: Two-stage IoU association with occlusion grace periods.
+- **Solid & Liquid Temporal Persistence**: Multi-frame confirmation filters out false positives.
+- **Deduplication Cooldown**: Suppresses alert spam for persistent violations (default: 180s).
+- **Annotated Evidence Snapshots**: Saved to date-partitioned storage (`storage/snapshots/YYYY/MM/DD/INC-*.jpg`).
+- **End-to-End Incident Pipeline Demonstration**:
+  ```bash
+  python ai/incident/e2e_incident_demo.py
+  ```
+
 ---
 
 ## Running Automated Tests
 
-Run all 34 unit & integration tests across Phases 1 through 4:
+Run all 54 unit & integration tests across Phases 1 through 5:
 ```bash
 python -m pytest tests/ -v
 ```

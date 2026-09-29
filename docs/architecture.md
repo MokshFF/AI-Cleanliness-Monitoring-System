@@ -157,3 +157,53 @@ The system supports configurable ROIs (bounding boxes or arbitrary polygons). Th
   - `LIQUID` ➔ `LiquidWasteSegmenter` (YOLO polygon segmentation & ROI analysis)
   - `BOTH` ➔ Both models concurrently, merged into unified `CameraFrameAIResult`.
 - **Evidence Frame Preservation**: Every `CameraFrameAIResult` bundles the raw NumPy frame, ready for Phase 5 object tracking and snapshot evidence storage.
+
+---
+
+## 8. Object Tracking, Temporal Persistence & Incident Engine (Phase 5)
+
+```
+[ CameraFrameAIResult ]
+           │
+           ├──────────────────────────────┬──────────────────────────────┐
+           ▼                                                             ▼
+ [ Solid Waste Pipeline ]                                      [ Liquid Waste Pipeline ]
+   - ByteTrack 2-stage IoU Matching                              - Multi-frame Area Aggregator
+   - State: ACTIVE, LOST, REMOVED                                - Area threshold: pixels / percent
+   - Grace period: 10 frames                                     - Temporal persistence: 4 frames / 2.0s
+   - Min persistence: 5 frames                                   - ROI zone isolation
+           │                                                             │
+           └──────────────────────────────┬──────────────────────────────┘
+                                          │
+                                          ▼
+                             [ Severity Calculator ]
+                               - Application-level triage
+                               - LOW / MEDIUM / HIGH
+                                          │
+                                          ▼
+                            [ Incident Deduplicator ]
+                               - Cooldown: 180 seconds
+                               - Keys: camera:waste_type:category:track_id/roi
+                                          │
+                                          ▼
+                            [ Evidence Snapshot Mgr ]
+                               - Partitioned storage: YYYY/MM/DD/INC-...jpg
+                               - Visual annotations (boxes, masks, banners)
+                                          │
+                                          ▼
+                             [ Cleanliness Incident ]
+                               - Emitted via on_incident(callback)
+```
+
+### 8.1 Tracking & Persistence Strategy
+- **Solid Waste**:
+  - ByteTrack two-stage IoU matching links bounding boxes across frames.
+  - Temporary track loss (e.g. pedestrian or vehicle occlusion) is tolerated for up to `SOLID_TRACK_GRACE_FRAMES` (10 frames) without re-identifying as a new object.
+  - An incident is only triggered once an object persists for `SOLID_MIN_CONSECUTIVE_FRAMES` (5 frames).
+- **Liquid Waste**:
+  - Validates affected area against `LIQUID_MIN_AFFECTED_AREA_PIXELS` and `LIQUID_MIN_AFFECTED_AREA_PERCENT`.
+  - Confirms accumulation when seen across `LIQUID_MIN_CONSECUTIVE_FRAMES` (4 frames) or persisting over `LIQUID_MIN_DURATION_SECONDS` (2.0s).
+- **Deduplication Cooldown**:
+  - Once confirmed, an incident enters a 180s cooldown window to suppress repeat alerts. Repeated violations after cooldown expiration generate distinct subsequent incidents.
+- **Evidence Snapshots**:
+  - Saved into date-partitioned storage (`storage/snapshots/YYYY/MM/DD/INC-...jpg`) with high-resolution bounding boxes, polygonal overlays, confidence tags, and metadata banners.

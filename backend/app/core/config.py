@@ -68,11 +68,29 @@ class Settings(BaseSettings):
     # AI Detection & Validation
     SOLID_MODEL_PATH: str = "./ai/models/weights/solid_waste_yolo.pt"
     LIQUID_MODEL_PATH: str = "./ai/models/weights/liquid_waste_yolo_seg.pt"
+
+    # Solid Waste Tracking & Validation (Phase 5)
+    SOLID_MIN_CONFIDENCE: float = 0.45
+    SOLID_MIN_CONSECUTIVE_FRAMES: int = 5
+    SOLID_TRACK_GRACE_FRAMES: int = 10
+    SOLID_TRACK_IOU_THRESHOLD: float = 0.30
+
+    # Liquid Waste Temporal Validation (Phase 5)
+    LIQUID_MIN_CONFIDENCE: float = 0.40
+    LIQUID_MIN_AFFECTED_AREA_PIXELS: int = 1200
+    LIQUID_MIN_AFFECTED_AREA_PERCENT: float = 1.0
+    LIQUID_AREA_CHECK_MODE: str = "OR"  # "OR", "AND", "PIXELS", "PERCENT"
+    LIQUID_MIN_CONSECUTIVE_FRAMES: int = 4
+    LIQUID_MIN_DURATION_SECONDS: float = 2.0
+
+    # Incident Deduplication & Cooldown (Phase 5)
+    INCIDENT_COOLDOWN_SECONDS: int = 180
+
+    # Backwards-compatibility aliases for Phase 1 tests
     SOLID_CONFIDENCE_THRESHOLD: float = 0.45
     LIQUID_CONFIDENCE_THRESHOLD: float = 0.40
     SOLID_TEMPORAL_CONFIRMATION_FRAMES: int = 5
     LIQUID_TEMPORAL_CONFIRMATION_FRAMES: int = 4
-    LIQUID_MIN_AFFECTED_AREA_PIXELS: int = 1200
     INCIDENT_DEDUPLICATION_COOLDOWN_SECONDS: int = 180
 
     # WebSockets
