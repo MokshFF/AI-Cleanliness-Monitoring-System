@@ -56,6 +56,8 @@ class IncidentCreate(BaseModel):
     affected_area: Optional[float] = Field(default=None, description="Backwards-compatible affected area metric")
 
     status: IncidentStatus = Field(default=IncidentStatus.NEW, description="Lifecycle status")
+    bounding_box: Optional[List[float]] = Field(default=None, description="Bounding box [x1, y1, x2, y2]")
+    mask_polygon: Optional[List[List[float]]] = Field(default=None, description="Liquid waste contour polygon")
     metadata: Optional[Dict[str, Any]] = None
 
 
@@ -82,6 +84,8 @@ class IncidentResponse(BaseModel):
     affected_area_percent: Optional[float] = None
     affected_area: Optional[float] = None
     roi_name: Optional[str] = None
+    bounding_box: Optional[List[float]] = None
+    mask_polygon: Optional[List[List[float]]] = None
     status: IncidentStatus = IncidentStatus.NEW
     created_at: datetime
     updated_at: Optional[datetime] = None

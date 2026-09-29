@@ -18,7 +18,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 4: Real CCTV / RTSP Video Ingestion + Multi-Camera Pipeline**
 - [x] **Phase 5: Object Tracking + Temporal Persistence + Incident Engine**
 - [x] **Phase 6: MongoDB Persistence + FastAPI REST API + Authentication**
-- [ ] **Phase 7: React Admin Web Dashboard**
+- [x] **Phase 7: React Admin Web Dashboard**
 - [ ] **Phase 8: WebSocket Real-Time Alerts**
 - [ ] **Phase 9: Camera Management, Maps & Analytics**
 - [ ] **Phase 10: Multi-Camera Optimization & Docker Orchestration**
@@ -87,9 +87,39 @@ python backend/scripts/e2e_phase6_demo.py
 
 ---
 
+## Frontend Admin Dashboard (Phase 7)
+
+A municipal command-center single-page application built with React 18, TypeScript, Vite, Tailwind CSS, and Recharts.
+
+### 1. Key Capabilities
+- **Role-Based Command Center**: Responsive layout with sidebar navigation, active session indicators, and role-based route guards (`Admin`, `Supervisor`, `Operator`).
+- **Dashboard Telemetry**: Real-time KPI summary cards, Recharts incident severity distributions, waste category breakdowns, camera health status, and recent incident feed.
+- **Incident Management**: Paginated table with debounced text search and multi-criteria filtering (camera, status, severity, waste type, date range).
+- **Incident Detail & Evidence**: Visual inspection modal displaying authenticated snapshot evidence via secure blob streaming (`GET /api/v1/incidents/{id}/snapshot`), bounding box/mask telemetry, and workflow transition modal (`NEW` ➔ `ACKNOWLEDGED` ➔ `RESOLVED` / `DISMISSED`).
+- **Camera Stream Registry**: Stream health status, operational mode badges (`SOLID`, `LIQUID`, `BOTH`), camera registration modal, and safe masked RTSP display (`rtsp://***:***@...`).
+- **Personnel Administration**: Admin-exclusive user creation, role assignment, and account activation/deactivation controls.
+- **System Settings & Diagnostics**: Live display of active YOLO taxonomies, API connection health, and security controls.
+
+### 2. Running Frontend Locally
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The Vite development server runs at `http://localhost:5173` and proxies `/api/v1` requests directly to FastAPI at `http://127.0.0.1:8000`.
+
+### 3. Building for Production
+```bash
+cd frontend
+npm run build
+```
+Production assets are compiled and type-checked into `frontend/dist/`.
+
+---
+
 ## Running Automated Tests
 
-Run all 84 unit & integration tests across Phases 1 through 6:
+Run all 104 unit, integration, and UI contract tests across Phases 1 through 7:
 ```bash
 python -m pytest tests/ -v
 ```
@@ -98,3 +128,4 @@ Run Phase 1 audit:
 ```bash
 python verify_phase1.py
 ```
+

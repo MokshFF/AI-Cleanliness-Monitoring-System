@@ -61,6 +61,7 @@ class Settings(BaseSettings):
         return self.MONGODB_DATABASE or self.MONGODB_DB_NAME
 
     # Storage
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent
     STORAGE_BASE_DIR: Path = Path("./storage")
     SNAPSHOT_STORAGE_DIR: Path = Path("./storage/snapshots")
     LOG_STORAGE_DIR: Path = Path("./storage/logs")

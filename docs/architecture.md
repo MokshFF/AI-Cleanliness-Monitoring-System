@@ -248,3 +248,55 @@ The system supports configurable ROIs (bounding boxes or arbitrary polygons). Th
   - `OPERATOR`: Access to camera inspection, incident querying, and status progression (`NEW` ➔ `ACKNOWLEDGED` ➔ `RESOLVED` / `DISMISSED`). Restricted from user administration and camera modification.
 - **RTSP Credential Protection**: Passwords in RTSP URLs are automatically masked across all API responses (`rtsp://user:***@host:port/path`) using schema-level validators and repository sanitation.
 - **Audit Logging**: All sensitive mutations (user creation, camera modification, incident acknowledgement) record user, timestamp, client IP, action, and redacted metadata in `audit_logs`.
+
+---
+
+## 10. React Admin Web Dashboard (Phase 7)
+
+```
+[ Operator / Supervisor / Administrator Browser ]
+                     │
+                     ▼
+         [ Vite SPA React Client ]
+  ┌────────────────────────────────────────────────────────┐
+  │  React Router v6                                       │
+  │    ├── /login (Unauthenticated)                        │
+  │    └── ProtectedRoute (Auth & RBAC Guards)             │
+  │          ├── AppLayout (Sidebar, Header, Profile)       │
+  │          ├── /dashboard (KPIs, Charts, Recent Feed)     │
+  │          ├── /incidents (Search, Filters, Pagination)   │
+  │          ├── /incidents/:id (Telemetry, Snapshot Modal) │
+  │          ├── /cameras (Stream Health & Registration)    │
+  │          ├── /cameras/:id (Settings, Masked RTSP URI)   │
+  │          ├── /users (Admin-Only Personnel Management)   │
+  │          └── /settings (Diagnostic Taxonomies & Specs)  │
+  └──────────────────────────┬─────────────────────────────┘
+                             │
+                             ▼
+     [ Axios API Client (`src/api/client.ts`) ]
+       ├── Request Interceptor: Injects Authorization Bearer Token
+       └── Response Interceptor: 401 Redirects & Error Extraction
+                             │
+                             ▼ (Reverse Proxy / Direct REST)
+      [ FastAPI Backend Endpoints (`/api/v1/*`) ]
+                             │
+             ┌───────────────┴───────────────┐
+             ▼                               ▼
+     [ MongoDB Database ]          [ Snapshot Storage ]
+  (Users, Cameras, Incidents)     (`GET /incidents/{id}/snapshot`)
+```
+
+### 10.1 Frontend Architecture & Component Hierarchy
+- **Single Page Application (SPA)**: Built with React 18, TypeScript, Vite 5, and Tailwind CSS.
+- **State Management**:
+  - `AuthContext`: Centralized authentication store managing current `user`, JWT `token`, local storage persistence, login/logout workflows, and role helpers (`isAdmin`, `isSupervisor`, `isOperator`).
+  - Page-level local state with clean optimistic and error-safe patterns.
+- **Secure Visual Evidence Streaming**:
+  - Browser image tags cannot natively attach `Authorization: Bearer <token>` headers without security risks.
+  - Implemented `incidentApi.fetchSnapshotBlob()` which queries `GET /api/v1/incidents/{incident_id}/snapshot` with JWT authentication and renders an in-memory `URL.createObjectURL(blob)`, safely revoked upon component unmount.
+- **Safety & Credential Protection**:
+  - RTSP credentials remain masked across all table views and camera detail views (`rtsp://***:***@...`).
+  - Role-based route guards (`ProtectedRoute`) prevent unauthorized access (e.g. operators navigating to `/users` are bounced to `/dashboard`).
+- **Telemetry & Visualization**:
+  - Recharts powering dynamic incident distribution by severity and waste taxonomy breakdown.
+  - Live filter engine supporting composite filtering (camera, status, severity, waste type, date range) with client-side debounce and server-side pagination.

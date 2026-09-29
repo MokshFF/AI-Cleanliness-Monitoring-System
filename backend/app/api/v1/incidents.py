@@ -3,8 +3,11 @@ import math
 import logging
 from datetime import datetime
 from typing import Optional
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
+from fastapi.responses import FileResponse
 
+from backend.app.core.config import settings
 from backend.app.schemas.incident import (
     IncidentCreate,
     IncidentUpdateStatus,
@@ -163,3 +166,45 @@ async def update_incident_status(
     })
 
     return IncidentResponse(**updated)
+ 
+ 
+@router.get("/{incident_id}/snapshot")
+async def get_incident_snapshot(
+    incident_id: str,
+    current_user: UserResponse = Depends(require_operator_or_admin),
+    incident_repo: IncidentRepository = Depends(get_incident_repo),
+):
+    """Securely streams the evidence snapshot image for an incident without exposing filesystem paths."""
+    inc = await incident_repo.get_by_id(incident_id)
+    if not inc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incident not found")
+
+    raw_path_str = inc.get("snapshot_path")
+    if not raw_path_str:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No snapshot associated with this incident")
+
+    # Safely resolve path and prevent path traversal
+    candidate = Path(raw_path_str)
+    if not candidate.is_absolute():
+        candidate = (settings.BASE_DIR / candidate).resolve()
+    else:
+        candidate = candidate.resolve()
+
+    # Security check: ensure path is within BASE_DIR
+    base_resolved = settings.BASE_DIR.resolve()
+    try:
+        candidate.relative_to(base_resolved)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to requested snapshot path")
+
+    if not candidate.is_file():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Snapshot image file not found on disk")
+
+    suffix = candidate.suffix.lower()
+    media_type = "image/jpeg"
+    if suffix == ".png":
+        media_type = "image/png"
+    elif suffix == ".webp":
+        media_type = "image/webp"
+
+    return FileResponse(path=str(candidate), media_type=media_type)
