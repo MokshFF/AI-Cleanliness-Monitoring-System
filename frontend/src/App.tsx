@@ -10,7 +10,8 @@ import { Cameras } from './pages/Cameras';
 import { CameraDetails } from './pages/CameraDetails';
 import { Users } from './pages/Users';
 import { Settings } from './pages/Settings';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { MapPage } from './pages/MapPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 
 export const App: React.FC = () => {
   return (
@@ -33,8 +34,8 @@ export const App: React.FC = () => {
         <Route path="incidents/:id" element={<IncidentDetails />} />
         <Route path="cameras" element={<Cameras />} />
         <Route path="cameras/:id" element={<CameraDetails />} />
-        <Route path="map" element={<PlaceholderPage module="map" />} />
-        <Route path="analytics" element={<PlaceholderPage module="analytics" />} />
+        <Route path="map" element={<MapPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
 
         {/* Admin-Only Route */}
         <Route

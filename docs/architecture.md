@@ -352,3 +352,42 @@ Camera capture workers and the `IncidentEngine` operate in background OS threads
 - **Client Exponential Backoff**: Frontend client reconnects automatically upon transient network failures (1s, 2s, 4s, 8s, 16s, max 30s) and resets upon connection success. Halts reconnection on HTTP 401/1008 policy violation.
 - **Client Deduplication**: Bounded in-memory event set (max 200 items) filters duplicate events by `incident_id` preventing alert and audio spam.
 
+---
+
+## 12. GIS Map, Longitudinal Analytics & Municipal Reporting Architecture (Phase 9)
+
+```
+[ MongoDB Incident & Camera Fleet Records ]
+                    │
+      ┌─────────────┼─────────────┐
+      ▼             ▼             ▼
+[ GIS Map API ] [ Analytics API ] [ Reporting API ]
+- /map/cameras   - /analytics/    - /reports/incidents.csv
+- /map/incidents    summary       - /reports/incidents.pdf
+      │             │             │
+      │             │             ├─▶ [ Audit Log ] (GENERATE_CSV/PDF_REPORT)
+      │             │             └─▶ [ ReportLab Engine / RFC 4180 CSV ]
+      ▼             ▼             ▼
+[ Leaflet Map ] [ Recharts Hub ] [ Browser Direct Download ]
+- Custom SVG    - Trend Area     - Formatted CSV spreadsheet
+  Markers         Chart          - Styled Municipal PDF Document
+- Popups with   - Severity Donut
+  Links         - Category Bars
+- Filter Bar    - Zone Breakdown
+```
+
+### 12.1 Geospatial Surveillance Map
+- **Projection Schemas**: `CameraMapItem` and `IncidentMapItem` project surveillance nodes and confirmed incidents into coordinates. Plaintext RTSP URLs, passwords, and tokens are omitted.
+- **Strict Coordinate Validation**: Cameras with `(0.0, 0.0)` or null coordinates are excluded from GIS rendering to prevent coordinate fabrication.
+- **Interactive UI**: OpenStreetMap/Leaflet integration via `react-leaflet` with custom status-colored camera icons and severity-pulsing incident pins.
+
+### 12.2 Longitudinal Aggregation Engine
+- **MongoDB Aggregation Pipelines**: `AnalyticsService` executes server-side `$match`, `$group`, `$sort`, and `$dateToString` pipelines to aggregate total incidents, active counts, resolution rate, category counts, camera hotspots, and zone compliance without loading bulk collections into RAM.
+- **Multi-Field Filtering**: Supports date-windowing, camera selection, waste type (`SOLID` / `LIQUID`), category, severity, and lifecycle status.
+- **Date Boundary Validation**: Rejects invalid date intervals (`start_date > end_date`) with HTTP 400.
+
+### 12.3 Municipal CSV & PDF Reporting
+- **RFC-4180 CSV Export**: Streams structured, quoted tabular data with incident IDs, timestamps, camera identifiers, waste types, confidence scores, duration, and affected area percentages.
+- **Official Styled PDF Reports**: ReportLab integration generates structured municipal compliance audit documents containing executive summary tables, categorical distributions, top camera fleet nodes, and detailed incident logs.
+- **Audit Logging**: Every report download triggers a non-repudiable audit log record (`GENERATE_CSV_REPORT`, `GENERATE_PDF_REPORT`) logging user ID, username, timestamp, and query filters.
+

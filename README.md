@@ -20,7 +20,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 6: MongoDB Persistence + FastAPI REST API + Authentication**
 - [x] **Phase 7: React Admin Web Dashboard**
 - [x] **Phase 8: WebSocket Real-Time Alerts**
-- [ ] **Phase 9: Camera Management, Maps & Analytics**
+- [x] **Phase 9: GIS Map, Longitudinal Analytics & Municipal Reporting**
 - [ ] **Phase 10: Multi-Camera Optimization & Docker Orchestration**
 
 ---
@@ -134,11 +134,35 @@ Full-duplex real-time surveillance alert distribution:
   python backend/scripts/e2e_phase8_demo.py
   ```
 
+## GIS Map, Longitudinal Analytics & Municipal Reporting (Phase 9)
+
+Geospatial surveillance visualization and municipal compliance reporting:
+- **GIS Surveillance Map**:
+  - Interactive Leaflet/OpenStreetMap monitoring view mounted at `/map`.
+  - Color-coded camera pins reflecting health status (`ONLINE`, `OFFLINE`, `CONNECTING`, `ERROR`).
+  - Severity-pulsing incident pins indicating solid (`S`) or liquid (`L`) waste.
+  - Multi-parameter filter bar (Camera, Waste Type, Severity, Lifecycle Status, and Layer Toggles).
+  - Popups with direct links to camera feeds and incident evidence snapshots.
+- **Longitudinal Analytics Dashboard**:
+  - Longitudinal trend models mounted at `/analytics`.
+  - Date preset selector (Today, Last 7 Days, Last 30 Days, Last 90 Days, Custom Range).
+  - Executive KPI summary cards (Total Violations, Active Unresolved, Resolved, Resolution Rate, Solid/Liquid Split).
+  - Recharts visual graphs: Incident frequency trend (AreaChart), Severity distribution (Donut PieChart), Category rankings (BarChart), Top Camera fleet nodes, and Zone compliance breakdown.
+- **Municipal CSV & PDF Reporting**:
+  - RFC-4180 compliant CSV exports with full violation logs (`GET /api/v1/reports/incidents.csv`).
+  - Styled multi-page municipal PDF compliance reports powered by ReportLab (`GET /api/v1/reports/incidents.pdf`).
+  - Strict audit logging for all exports (`GENERATE_CSV_REPORT`, `GENERATE_PDF_REPORT`).
+  - Strict credential masking: zero RTSP passwords or internal tokens in reports.
+- **Phase 9 End-to-End Demonstration**:
+  ```bash
+  python backend/scripts/e2e_phase9_demo.py
+  ```
+
 ---
 
 ## Running Automated Tests
 
-Run all 122 unit, integration, and UI contract tests across Phases 1 through 8:
+Run all 147 unit, integration, and UI contract tests across Phases 1 through 9:
 ```bash
 python -m pytest tests/ -v
 ```

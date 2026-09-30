@@ -32,6 +32,16 @@ def get_audit_repo() -> AuditRepository:
     return AuditRepository()
 
 
+def get_analytics_service():
+    from backend.app.services.analytics_service import AnalyticsService
+    return AnalyticsService()
+
+
+def get_reporting_service():
+    from backend.app.services.reporting_service import ReportingService
+    return ReportingService()
+
+
 async def get_current_user(
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security_bearer),
     user_repo: UserRepository = Depends(get_user_repo),
