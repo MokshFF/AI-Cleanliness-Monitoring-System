@@ -19,7 +19,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 5: Object Tracking + Temporal Persistence + Incident Engine**
 - [x] **Phase 6: MongoDB Persistence + FastAPI REST API + Authentication**
 - [x] **Phase 7: React Admin Web Dashboard**
-- [ ] **Phase 8: WebSocket Real-Time Alerts**
+- [x] **Phase 8: WebSocket Real-Time Alerts**
 - [ ] **Phase 9: Camera Management, Maps & Analytics**
 - [ ] **Phase 10: Multi-Camera Optimization & Docker Orchestration**
 
@@ -117,9 +117,28 @@ Production assets are compiled and type-checked into `frontend/dist/`.
 
 ---
 
+## Real-Time WebSocket Alerting (Phase 8)
+
+Full-duplex real-time surveillance alert distribution:
+- **WebSocket Endpoint**: `GET /ws/alerts?token=<JWT>` with query-string JWT authentication.
+- **Persistence-First Policy**: `IncidentEventService` guarantees incidents are durably committed to MongoDB before broadcasting `INCIDENT_CREATED`.
+- **Status Lifecycle Broadcasts**: `PATCH /api/v1/incidents/{incident_id}/status` broadcasts `INCIDENT_UPDATED` in real time.
+- **Thread-Safe Dispatch**: Background camera worker threads dispatch events asynchronously via `ConnectionManager.broadcast_threadsafe()`.
+- **Frontend Command Center Client**:
+  - Live toast notifications with direct inspection shortcuts.
+  - Non-intrusive synthesized audio chime via Web Audio API.
+  - Real-time KPI counter increments and table row updates without page reload.
+  - Connection health pill (`● LIVE`, `● RECONNECTING`, `● OFFLINE`) with exponential backoff.
+- **End-to-End WebSocket Demonstration**:
+  ```bash
+  python backend/scripts/e2e_phase8_demo.py
+  ```
+
+---
+
 ## Running Automated Tests
 
-Run all 104 unit, integration, and UI contract tests across Phases 1 through 7:
+Run all 122 unit, integration, and UI contract tests across Phases 1 through 8:
 ```bash
 python -m pytest tests/ -v
 ```
@@ -128,4 +147,5 @@ Run Phase 1 audit:
 ```bash
 python verify_phase1.py
 ```
+
 

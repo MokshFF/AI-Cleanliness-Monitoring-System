@@ -104,7 +104,9 @@ class Settings(BaseSettings):
     LIQUID_TEMPORAL_CONFIRMATION_FRAMES: int = 4
     INCIDENT_DEDUPLICATION_COOLDOWN_SECONDS: int = 180
 
-    # WebSockets
+    # WebSockets (Phase 8)
+    WEBSOCKET_ENABLED: bool = True
+    WEBSOCKET_HEARTBEAT_SECONDS: int = 30
     WS_PING_INTERVAL_SECONDS: int = 20
     WS_PING_TIMEOUT_SECONDS: int = 10
 

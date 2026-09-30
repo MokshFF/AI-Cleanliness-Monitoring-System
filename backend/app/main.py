@@ -1,6 +1,7 @@
-"""FastAPI application initialization and lifecycle setup."""
+import asyncio
+from typing import Optional
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -9,6 +10,8 @@ from backend.app.core.logging_config import setup_logging
 from backend.app.db.mongodb import async_db_manager
 from backend.app.db.indexes import create_indexes
 from backend.app.api.v1.router import api_router
+from backend.app.websocket.manager import get_connection_manager
+from backend.app.api.v1.websocket import handle_websocket_alerts
 
 logger = setup_logging()
 
@@ -35,11 +38,23 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("Database initialization warning: %s", e)
 
+    # 3. Configure WebSocket connection manager
+    ws_manager = get_connection_manager()
+    try:
+        ws_manager.set_event_loop(asyncio.get_running_loop())
+    except RuntimeError:
+        pass
+
+    if settings.WEBSOCKET_ENABLED:
+        await ws_manager.start_heartbeat(settings.WEBSOCKET_HEARTBEAT_SECONDS)
+
     yield
 
     # Shutdown
     logger.info("Shutting down %s...", settings.PROJECT_NAME)
+    ws_manager.stop_heartbeat()
     async_db_manager.close()
+
 
 
 app = FastAPI(
@@ -95,3 +110,13 @@ async def system_status():
             "liquid_spill", "sewage_overflow", "waterlogging", "drain_overflow"
         ],
     }
+
+
+@app.websocket("/ws/alerts")
+async def root_websocket_alerts_endpoint(
+    websocket: WebSocket,
+    token: Optional[str] = Query(None),
+):
+    """Direct root WebSocket endpoint /ws/alerts for authenticated real-time surveillance alerts."""
+    await handle_websocket_alerts(websocket, token)
+

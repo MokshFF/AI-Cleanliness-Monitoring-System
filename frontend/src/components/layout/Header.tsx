@@ -1,10 +1,12 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Shield, LogOut, User as UserIcon, Bell } from 'lucide-react';
+import { useWebSocket } from '../../websocket/WebSocketProvider';
+import { Shield, LogOut, User as UserIcon, Bell, Volume2, VolumeX } from 'lucide-react';
 import { Badge } from '../common/Badge';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
+  const { connectionStatus, activeAlerts, audioEnabled, toggleAudio } = useWebSocket();
 
   return (
     <header className="h-16 bg-[#0E1626] border-b border-[#24324D] px-6 flex items-center justify-between sticky top-0 z-30 shadow-md">
@@ -26,16 +28,68 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* User Actions & Profile */}
-      <div className="flex items-center space-x-4">
-        {/* Placeholder Notification Bell */}
+      {/* User Actions, Live Status & Profile */}
+      <div className="flex items-center space-x-3">
+        {/* Real-Time Alert Status Indicator */}
+        <div className="flex items-center space-x-2 px-2.5 py-1 rounded-full text-xs font-medium border bg-[#151F32] border-[#24324D]">
+          <span className="flex h-2 w-2 relative">
+            {connectionStatus === 'CONNECTED' && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            )}
+            <span
+              className={`relative inline-flex rounded-full h-2 w-2 ${
+                connectionStatus === 'CONNECTED'
+                  ? 'bg-emerald-500'
+                  : connectionStatus === 'RECONNECTING'
+                  ? 'bg-amber-500 animate-pulse'
+                  : 'bg-rose-500'
+              }`}
+            ></span>
+          </span>
+          <span
+            className={`text-[11px] font-semibold tracking-wide ${
+              connectionStatus === 'CONNECTED'
+                ? 'text-emerald-400'
+                : connectionStatus === 'RECONNECTING'
+                ? 'text-amber-400'
+                : 'text-rose-400'
+            }`}
+          >
+            {connectionStatus === 'CONNECTED'
+              ? 'LIVE'
+              : connectionStatus === 'RECONNECTING'
+              ? 'RECONNECTING'
+              : 'OFFLINE'}
+          </span>
+        </div>
+
+        {/* Audio Alert Toggle */}
         <button
-          title="Alert Notifications (Phase 8 WebSocket)"
-          className="p-2 text-gray-400 hover:text-gray-200 hover:bg-[#1E2D48] rounded-lg transition relative"
+          onClick={toggleAudio}
+          title={audioEnabled ? 'Audio Alerts: Enabled' : 'Audio Alerts: Muted'}
+          className={`p-2 rounded-lg transition border ${
+            audioEnabled
+              ? 'text-blue-400 bg-blue-950/40 border-blue-900/60 hover:bg-blue-900/50'
+              : 'text-gray-500 bg-[#151F32] border-[#24324D] hover:text-gray-300'
+          }`}
         >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full"></span>
+          {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
+
+        {/* Notification Bell with Active Alert Count */}
+        <div className="relative">
+          <div
+            title={`Real-Time Alert Stream (${connectionStatus})`}
+            className="p-2 text-gray-400 bg-[#151F32] border border-[#24324D] rounded-lg relative"
+          >
+            <Bell className="w-4 h-4" />
+            {activeAlerts.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                {activeAlerts.length}
+              </span>
+            )}
+          </div>
+        </div>
 
         {/* User Card */}
         {user && (

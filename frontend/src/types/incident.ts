@@ -7,6 +7,7 @@ export type WasteType = 'SOLID' | 'LIQUID';
 export interface Incident {
   incident_id: string;
   camera_id: string;
+  location?: string;
   waste_type: WasteType;
   category: string;
   confidence: number;

@@ -125,17 +125,12 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Credentials guide for testing/evaluation */}
-        <div className="mt-8 pt-4 border-t border-[#24324D] text-[11px] text-gray-400 bg-[#0E1626]/70 p-3 rounded-lg border">
-          <p className="font-semibold text-gray-300 mb-1">Default Bootstrap Credentials:</p>
-          <div className="flex justify-between">
-            <span>Admin Username:</span>
-            <code className="text-blue-400 font-mono">admin</code>
-          </div>
-          <div className="flex justify-between mt-0.5">
-            <span>Admin Password:</span>
-            <code className="text-blue-400 font-mono">AdminSecurePassword@2026</code>
-          </div>
+        {/* Security & Access Notice */}
+        <div className="mt-8 pt-4 border-t border-[#24324D] text-[11px] text-gray-400 bg-[#0E1626]/70 p-3 rounded-lg border border-[#24324D]">
+          <p className="font-semibold text-gray-300 mb-0.5">Official Surveillance Notice</p>
+          <p className="text-gray-400 leading-relaxed">
+            Restricted to authorized municipal administrators and surveillance operators. Initial system credentials are configured via server environment variables.
+          </p>
         </div>
       </div>
     </div>

@@ -26,6 +26,8 @@ from backend.app.api.deps import (
     get_audit_repo,
     require_operator_or_admin,
 )
+from backend.app.websocket.manager import get_connection_manager
+from backend.app.websocket.alerts import create_incident_updated_event
 
 logger = logging.getLogger("api_incidents")
 router = APIRouter(prefix="/incidents", tags=["Incidents"])
@@ -164,6 +166,20 @@ async def update_incident_status(
             "notes": update_data.notes,
         },
     })
+
+    # Real-time WebSocket broadcast of INCIDENT_UPDATED event
+    try:
+        ws_manager = get_connection_manager()
+        event = create_incident_updated_event(
+            incident_id=incident_id,
+            status=new_status,
+            notes=update_data.notes,
+            updated_at=updated.get("updated_at"),
+            updated_by=current_user.username,
+        )
+        await ws_manager.broadcast(event)
+    except Exception as e:
+        logger.warning("Failed broadcasting INCIDENT_UPDATED for %s: %s", incident_id, e)
 
     return IncidentResponse(**updated)
  

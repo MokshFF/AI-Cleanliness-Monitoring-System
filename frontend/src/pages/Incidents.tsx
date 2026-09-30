@@ -4,6 +4,7 @@ import { incidentApi } from '../api/incidents';
 import { cameraApi } from '../api/cameras';
 import { Incident, IncidentStatus, IncidentSeverity, WasteType } from '../types/incident';
 import { Camera } from '../types/camera';
+import { useWebSocket } from '../websocket/WebSocketProvider';
 import { Badge } from '../components/common/Badge';
 import { Card } from '../components/common/Card';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
@@ -16,6 +17,7 @@ import {
   ChevronRight,
   Eye,
   RotateCcw,
+  Sparkles,
 } from 'lucide-react';
 
 export const Incidents: React.FC = () => {
@@ -23,6 +25,9 @@ export const Incidents: React.FC = () => {
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [unseenCount, setUnseenCount] = useState<number>(0);
+
+  const { subscribeIncidentCreated, subscribeIncidentUpdated } = useWebSocket();
 
   // Pagination state
   const [page, setPage] = useState<number>(1);
@@ -59,6 +64,7 @@ export const Incidents: React.FC = () => {
       setIncidents(response.items);
       setTotalPages(response.total_pages);
       setTotalCount(response.total);
+      setUnseenCount(0);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to retrieve incidents from repository.');
     } finally {
@@ -74,6 +80,61 @@ export const Incidents: React.FC = () => {
   useEffect(() => {
     fetchIncidents();
   }, [page, pageSize, selectedCamera, selectedStatus, selectedSeverity, selectedWasteType]);
+
+  // Real-time WebSocket subscriptions
+  useEffect(() => {
+    const unsubCreated = subscribeIncidentCreated((payload) => {
+      const inc = payload.incident;
+
+      // Check filter compatibility
+      const matchCam = !selectedCamera || inc.camera_id === selectedCamera;
+      const matchStatus = !selectedStatus || inc.status === selectedStatus;
+      const matchSev = !selectedSeverity || inc.severity === selectedSeverity;
+      const matchType = !selectedWasteType || inc.waste_type === selectedWasteType;
+      const matchCat =
+        !searchCategory.trim() ||
+        inc.category.toLowerCase().includes(searchCategory.trim().toLowerCase());
+
+      const isCompatible = matchCam && matchStatus && matchSev && matchType && matchCat;
+
+      if (isCompatible && page === 1) {
+        setIncidents((prev) => {
+          if (prev.some((item) => item.incident_id === inc.incident_id)) {
+            return prev;
+          }
+          return [inc, ...prev.slice(0, pageSize - 1)];
+        });
+        setTotalCount((prev) => prev + 1);
+      } else {
+        setUnseenCount((prev) => prev + 1);
+      }
+    });
+
+    const unsubUpdated = subscribeIncidentUpdated((payload) => {
+      setIncidents((prev) =>
+        prev.map((item) =>
+          item.incident_id === payload.incident_id
+            ? { ...item, status: payload.status as any, notes: payload.notes ?? item.notes }
+            : item
+        )
+      );
+    });
+
+    return () => {
+      unsubCreated();
+      unsubUpdated();
+    };
+  }, [
+    subscribeIncidentCreated,
+    subscribeIncidentUpdated,
+    selectedCamera,
+    selectedStatus,
+    selectedSeverity,
+    selectedWasteType,
+    searchCategory,
+    page,
+    pageSize,
+  ]);
 
   const handleApplyFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,6 +304,27 @@ export const Incidents: React.FC = () => {
 
       {/* Error state */}
       {error && <ErrorAlert title="Query Error" message={error} onRetry={fetchIncidents} />}
+
+      {/* Real-time Unseen Incidents Alert Banner */}
+      {unseenCount > 0 && (
+        <div className="bg-blue-950/70 border border-blue-500/60 rounded-xl p-3 flex items-center justify-between shadow-lg animate-in fade-in duration-200">
+          <div className="flex items-center space-x-2 text-xs text-blue-200">
+            <Sparkles className="w-4 h-4 text-blue-400" />
+            <span>
+              <strong>{unseenCount}</strong> new {unseenCount === 1 ? 'incident' : 'incidents'} detected in real time.
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setPage(1);
+              fetchIncidents();
+            }}
+            className="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition shadow"
+          >
+            Update Table View
+          </button>
+        </div>
+      )}
 
       {/* Incidents Table */}
       <Card className="overflow-hidden p-0">

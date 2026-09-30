@@ -8,6 +8,7 @@ import { Badge } from '../components/common/Badge';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorAlert } from '../components/common/ErrorAlert';
 import { Link } from 'react-router-dom';
+import { useWebSocket } from '../websocket/WebSocketProvider';
 import {
   Camera as CameraIcon,
   AlertTriangle,
@@ -38,6 +39,8 @@ export const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { connectionStatus, subscribeIncidentCreated, subscribeIncidentUpdated } = useWebSocket();
+
   const fetchDashboardData = async () => {
     setIsLoading(true);
     setError(null);
@@ -59,6 +62,36 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Real-time WebSocket event listeners
+  useEffect(() => {
+    const unsubCreated = subscribeIncidentCreated((payload) => {
+      const newInc = payload.incident;
+      setIncidents((prev) => {
+        // Prevent duplicate in local state if already present
+        if (prev.some((item) => item.incident_id === newInc.incident_id)) {
+          return prev;
+        }
+        return [newInc, ...prev];
+      });
+      setTotalIncidentsCount((prev) => prev + 1);
+    });
+
+    const unsubUpdated = subscribeIncidentUpdated((payload) => {
+      setIncidents((prev) =>
+        prev.map((item) =>
+          item.incident_id === payload.incident_id
+            ? { ...item, status: payload.status as any, notes: payload.notes ?? item.notes }
+            : item
+        )
+      );
+    });
+
+    return () => {
+      unsubCreated();
+      unsubUpdated();
+    };
+  }, [subscribeIncidentCreated, subscribeIncidentUpdated]);
 
   if (isLoading) {
     return <LoadingSpinner message="Aggregating Command Center Telemetry..." size="lg" />;
@@ -129,9 +162,39 @@ export const Dashboard: React.FC = () => {
             Real-time cleanliness metrics across active CCTV monitoring nodes
           </p>
         </div>
-        <div className="flex items-center space-x-2 text-xs text-gray-400 bg-[#151F32] border border-[#24324D] px-3 py-1.5 rounded-lg self-start">
-          <Clock className="w-3.5 h-3.5 text-blue-400" />
-          <span>Polled from FastAPI backend</span>
+        <div className="flex items-center space-x-3 self-start">
+          <div className="flex items-center space-x-2 text-xs bg-[#151F32] border border-[#24324D] px-3 py-1.5 rounded-lg">
+            <span className="flex h-2 w-2 relative">
+              {connectionStatus === 'CONNECTED' && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              )}
+              <span
+                className={`relative inline-flex rounded-full h-2 w-2 ${
+                  connectionStatus === 'CONNECTED'
+                    ? 'bg-emerald-500'
+                    : connectionStatus === 'RECONNECTING'
+                    ? 'bg-amber-500 animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              ></span>
+            </span>
+            <span
+              className={`font-semibold tracking-wide ${
+                connectionStatus === 'CONNECTED'
+                  ? 'text-emerald-400'
+                  : connectionStatus === 'RECONNECTING'
+                  ? 'text-amber-400'
+                  : 'text-rose-400'
+              }`}
+            >
+              Real-Time Alerts: {connectionStatus}
+            </span>
+          </div>
+
+          <div className="hidden sm:flex items-center space-x-2 text-xs text-gray-400 bg-[#151F32] border border-[#24324D] px-3 py-1.5 rounded-lg">
+            <Clock className="w-3.5 h-3.5 text-blue-400" />
+            <span>FastAPI REST + WebSocket</span>
+          </div>
         </div>
       </div>
 

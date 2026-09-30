@@ -300,3 +300,55 @@ The system supports configurable ROIs (bounding boxes or arbitrary polygons). Th
 - **Telemetry & Visualization**:
   - Recharts powering dynamic incident distribution by severity and waste taxonomy breakdown.
   - Live filter engine supporting composite filtering (camera, status, severity, waste type, date range) with client-side debounce and server-side pagination.
+
+---
+
+## 11. WebSocket Real-Time Alerting Architecture (Phase 8)
+
+```
+[ Phase 5 IncidentEngine ]
+            │
+            ▼ on_incident(callback)
+[ IncidentEventService ] ──▶ Coordinates Atomic Persistence & Notification
+            │
+            ├──▶ 1. Persist to MongoDB (`IncidentRepository.create`)
+            │       │
+            │       ▼ (If and only if persistence succeeds)
+            └──▶ 2. Dispatch to WebSocket Manager
+                        │
+                        ▼ (Threadsafe Event Loop Dispatch)
+            [ ConnectionManager (`backend/app/websocket/manager.py`) ]
+                        │
+       ┌────────────────┴────────────────┬────────────────┐
+       ▼                                 ▼                ▼
+[ Browser Client 1 ]              [ Browser Client 2 ]  [ Dead Client ]
+  - JWT Query Auth: /ws/alerts      - JWT Query Auth      - Auto-pruned
+  - Handshake: CONNECTED            - Handshake: CONNECTED
+  - Events: INCIDENT_CREATED        - Events: INCIDENT_CREATED
+            INCIDENT_UPDATED                  INCIDENT_UPDATED
+            PING / PONG (Heartbeat)           PING / PONG
+       │                                 │
+       ▼                                 ▼
+[ React Admin Dashboard ]        [ React Admin Dashboard ]
+  - Visual Alert Toast Banner       - Visual Alert Toast Banner
+  - Non-Intrusive Audio Chime       - Non-Intrusive Audio Chime
+  - Real-Time KPI Counter Increment - Real-Time KPI Counter Increment
+  - Live Table Prepending           - Live Table Prepending
+```
+
+### 11.1 Persistence-First Broadcasting Policy
+The system guarantees that an alert is never broadcasted to dashboard clients unless the underlying incident has been durably committed to MongoDB:
+1. `IncidentEngine` confirms an incident through tracking and temporal validation.
+2. `IncidentEventService` attempts MongoDB write.
+3. If persistence fails: logs failure, increments error counters, suppresses WebSocket broadcast, and protects the CCTV capture thread from crashing.
+4. If persistence succeeds: dispatches `INCIDENT_CREATED` event to `ConnectionManager`.
+
+### 11.2 Thread-Safe Background Worker Dispatch
+Camera capture workers and the `IncidentEngine` operate in background OS threads. FastAPI WebSockets run on the asynchronous event loop. `ConnectionManager.broadcast_threadsafe()` safely submits coroutines to the primary event loop using `asyncio.run_coroutine_threadsafe()`, guaranteeing non-blocking operation for camera pipelines.
+
+### 11.3 Security & Lifecycle Management
+- **Query Parameter JWT Handshake**: Uses standard browser WebSocket query string (`/ws/alerts?token=<JWT>`), validating user existence, active status, and RBAC permissions. Query tokens are stripped from server logs and excluded from all event payloads.
+- **Heartbeat & Dead Connection Cleanup**: Periodic 30-second ping/pong cycle cleans up dead client sockets without resource leakage.
+- **Client Exponential Backoff**: Frontend client reconnects automatically upon transient network failures (1s, 2s, 4s, 8s, 16s, max 30s) and resets upon connection success. Halts reconnection on HTTP 401/1008 policy violation.
+- **Client Deduplication**: Bounded in-memory event set (max 200 items) filters duplicate events by `incident_id` preventing alert and audio spam.
+

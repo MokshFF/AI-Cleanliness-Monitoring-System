@@ -2,8 +2,12 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import { useWebSocket } from '../../websocket/WebSocketProvider';
+import { IncidentAlertToast } from '../alerts/IncidentAlertToast';
 
 export const AppLayout: React.FC = () => {
+  const { activeAlerts, dismissAlert } = useWebSocket();
+
   return (
     <div className="flex flex-col min-h-screen bg-[#0B1120] text-gray-100 font-sans">
       <Header />
@@ -13,6 +17,7 @@ export const AppLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+      <IncidentAlertToast alerts={activeAlerts} onDismiss={dismissAlert} />
     </div>
   );
 };
