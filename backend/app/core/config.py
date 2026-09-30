@@ -64,8 +64,15 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent
     STORAGE_BASE_DIR: Path = Path("./storage")
     SNAPSHOT_STORAGE_DIR: Path = Path("./storage/snapshots")
+    ANNOTATED_STORAGE_DIR: Path = Path("./storage/annotated")
     LOG_STORAGE_DIR: Path = Path("./storage/logs")
     TEST_VIDEO_DIR: Path = Path("./storage/test_videos")
+
+    # Single Camera Prototype Settings
+    PROTOTYPE_CAMERA_ID: str = "CAM-001"
+    PROTOTYPE_CAMERA_NAME: str = "Main Gate Camera"
+    PROTOTYPE_CAMERA_LOCATION: str = "Main Gate Surveillance Zone"
+    PROTOTYPE_RTSP_URL: Optional[str] = None
 
     # Video Ingestion
     DEFAULT_FRAME_WIDTH: int = 1280

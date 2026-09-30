@@ -8,6 +8,7 @@ from backend.app.api.v1.websocket import router as websocket_router
 from backend.app.api.v1.map import router as map_router
 from backend.app.api.v1.analytics import router as analytics_router
 from backend.app.api.v1.reports import router as reports_router
+from backend.app.api.v1.detection import router as detection_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -18,4 +19,5 @@ api_router.include_router(websocket_router)
 api_router.include_router(map_router)
 api_router.include_router(analytics_router)
 api_router.include_router(reports_router)
+api_router.include_router(detection_router)
 

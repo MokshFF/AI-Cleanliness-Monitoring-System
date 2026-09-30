@@ -10,17 +10,21 @@ import {
   Users,
   Settings,
   Cpu,
+  ScanLine,
+  Video,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { isAdmin } = useAuth();
 
   const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/incidents', label: 'Incidents', icon: AlertTriangle },
-    { to: '/cameras', label: 'Cameras', icon: Camera },
-    { to: '/map', label: 'GIS Map (Phase 9)', icon: MapPin, isUpcoming: true },
-    { to: '/analytics', label: 'Analytics (Phase 9)', icon: BarChart3, isUpcoming: true },
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, isUpcoming: false },
+    { to: '/detect', label: 'Image Detection', icon: ScanLine, isUpcoming: false },
+    { to: '/camera-test', label: 'Camera Test Lab', icon: Video, isUpcoming: false },
+    { to: '/incidents', label: 'Incidents', icon: AlertTriangle, isUpcoming: false },
+    { to: '/cameras', label: 'Cameras', icon: Camera, isUpcoming: false },
+    { to: '/map', label: 'GIS Surveillance Map', icon: MapPin, isUpcoming: false },
+    { to: '/analytics', label: 'Analytics & Reports', icon: BarChart3, isUpcoming: false },
   ];
 
   if (isAdmin) {

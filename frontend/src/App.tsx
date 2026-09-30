@@ -12,6 +12,8 @@ import { Users } from './pages/Users';
 import { Settings } from './pages/Settings';
 import { MapPage } from './pages/MapPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { DetectPage } from './pages/DetectPage';
+import { CameraTestPage } from './pages/CameraTestPage';
 
 export const App: React.FC = () => {
   return (
@@ -30,6 +32,8 @@ export const App: React.FC = () => {
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="detect" element={<DetectPage />} />
+        <Route path="camera-test" element={<CameraTestPage />} />
         <Route path="incidents" element={<Incidents />} />
         <Route path="incidents/:id" element={<IncidentDetails />} />
         <Route path="cameras" element={<Cameras />} />

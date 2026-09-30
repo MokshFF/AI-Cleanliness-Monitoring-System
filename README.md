@@ -21,6 +21,7 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 - [x] **Phase 7: React Admin Web Dashboard**
 - [x] **Phase 8: WebSocket Real-Time Alerts**
 - [x] **Phase 9: GIS Map, Longitudinal Analytics & Municipal Reporting**
+- [x] **Single-Image & Single-Camera Prototype Integration**
 - [ ] **Phase 10: Multi-Camera Optimization & Docker Orchestration**
 
 ---
@@ -160,9 +161,31 @@ Geospatial surveillance visualization and municipal compliance reporting:
 
 ---
 
+## Single-Image & Single-Camera Prototype Demonstration
+
+Demonstrate the full pipeline (`Input -> AI -> Tracking -> Incident Engine -> MongoDB -> WebSocket -> React Dashboard`):
+
+### 1. Run Automated E2E Prototype Verification
+```bash
+python backend/scripts/e2e_prototype_demo.py
+```
+
+### 2. Single-Image Detection & Inspection (`/detect`)
+- Upload JPG/PNG images for instant solid/liquid waste detection.
+- Compares original vs annotated image with highlighted bounding boxes.
+- Direct link to created incident in MongoDB.
+- API Endpoint: `POST /api/v1/detection/image`
+
+### 3. Single-Camera Live Stream Test (`/camera-test`)
+- Test RTSP IP cameras, local USB webcams (`webcam://0`), or local MP4 files.
+- Live Start / Stop controls with real-time FPS & detection telemetry.
+- Polled annotated MJPEG preview stream: `GET /api/v1/detection/camera-test/frame`.
+
+---
+
 ## Running Automated Tests
 
-Run all 147 unit, integration, and UI contract tests across Phases 1 through 9:
+Run all 159 unit, integration, and UI contract tests across Phases 1 through 9 and the Prototype Integration:
 ```bash
 python -m pytest tests/ -v
 ```
