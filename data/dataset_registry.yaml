@@ -1,0 +1,62 @@
+# ==============================================================================
+# Master Dataset Registry - AI-Based National Cleanliness Monitoring System
+# Tracks all training, validation, and evaluation datasets, licensing, and lineage
+# ==============================================================================
+version: "2.0.0"
+updated_at: "2026-09-30T20:30:00Z"
+
+datasets:
+  - id: "DS-01"
+    name: "Garbage Classification 3 (GC1)"
+    source: "Roboflow Universe / Hugging Face (keremberke/garbage-object-detection)"
+    url: "https://universe.roboflow.com/material-identification/garbage-classification-3"
+    license: "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+    domain: "Outdoor & indoor real post-consumer waste photography"
+    annotation_format: "COCO Bounding Boxes"
+    raw_images: 10464
+    raw_annotations: 74090
+    purpose: "Primary solid waste detection training, validation, and test foundation"
+    classes_provided:
+      - biodegradable
+      - cardboard
+      - glass
+      - metal
+      - paper
+      - plastic
+    target_mapping:
+      biodegradable: "food_waste"
+      cardboard: "paper"
+      paper: "paper"
+      metal: "can"
+      plastic (aspect ratio >= 1.25 or <= 0.70): "plastic_bottle"
+      plastic (aspect ratio 0.70 - 1.25): "plastic_bag"
+      cluster (>= 4 items, >= 15% area): "garbage_pile"
+      glass: "EXCLUDED (outside 6 target application classes)"
+
+  - id: "DS-02"
+    name: "CCTV Street & Roadside Real Surveillance Subset"
+    source: "Local field surveillance captures & roadside waste uploads"
+    license: "Proprietary / Project Field Dataset"
+    domain: "Real roadside waste piles, surveillance angles, CCTV video frames"
+    annotation_format: "YOLO Bounding Boxes & Tracking Sequences"
+    raw_images: 25
+    purpose: "CCTV robustness benchmarking, temporal validation, and threshold calibration"
+    classes_provided:
+      - garbage_pile
+      - food_waste
+      - plastic_bottle
+      - plastic_bag
+
+  - id: "DS-03"
+    name: "Liquid Waste Spatial Segmentation Dataset"
+    source: "Municipal drainage & overflow benchmark"
+    license: "Internal Project Benchmark"
+    domain: "Roadway waterlogging, sewage overflows, liquid spills, drain leaks"
+    annotation_format: "YOLO Polygon Segmentation Masks"
+    raw_images: 120
+    purpose: "Liquid waste segmentation and affected surface area calculation"
+    classes_provided:
+      - liquid_spill
+      - sewage_overflow
+      - waterlogging
+      - drain_overflow

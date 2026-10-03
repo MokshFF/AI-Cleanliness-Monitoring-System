@@ -1,0 +1,496 @@
+{
+  "timestamp": "2026-09-30T16:36:03.349205+00:00",
+  "baseline": {
+    "scale_metrics": {
+      "small": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 106,
+        "gt_total": 106,
+        "pred_total": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "approx_ap50": 0.0
+      },
+      "medium": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 318,
+        "gt_total": 318,
+        "pred_total": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "approx_ap50": 0.0
+      },
+      "large": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 364,
+        "gt_total": 364,
+        "pred_total": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "approx_ap50": 0.0
+      }
+    },
+    "per_class": {
+      "plastic_bottle": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 138,
+        "gt": 138
+      },
+      "plastic_bag": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 73,
+        "gt": 73
+      },
+      "paper": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 92,
+        "gt": 92
+      },
+      "can": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 53,
+        "gt": 53
+      },
+      "food_waste": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 390,
+        "gt": 390
+      },
+      "garbage_pile": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 42,
+        "gt": 42
+      }
+    },
+    "latency_ms": 32.67,
+    "fps": 30.61,
+    "total_test_images": 150
+  },
+  "experiments": {
+    "EXP-01-v8n-640": {
+      "exp_id": "EXP-01-v8n-640",
+      "base_model": "yolov8n.pt",
+      "epochs": 8,
+      "imgsz": 640,
+      "batch_size": 16,
+      "train_duration_s": 1338.9,
+      "weights_path": "C:\\Users\\avars\\Downloads\\AI Based Cleanliness Monitoring System\\training\\experiments\\v2\\runs\\EXP-01-v8n-640\\weights\\best.pt",
+      "val": {
+        "precision": 0.465,
+        "recall": 0.4235,
+        "map50": 0.4278,
+        "map50_95": 0.2732
+      },
+      "test": {
+        "precision": 0.5131,
+        "recall": 0.3888,
+        "f1": 0.4424,
+        "map50": 0.4025,
+        "map50_95": 0.2511,
+        "per_class": {
+          "plastic_bottle": {
+            "precision": 0.386,
+            "recall": 0.1957,
+            "f1": 0.2597,
+            "map50": 0.2006,
+            "map50_95": 0.0959
+          },
+          "plastic_bag": {
+            "precision": 0.3969,
+            "recall": 0.2525,
+            "f1": 0.3086,
+            "map50": 0.241,
+            "map50_95": 0.1658
+          },
+          "paper": {
+            "precision": 0.5755,
+            "recall": 0.3478,
+            "f1": 0.4336,
+            "map50": 0.3676,
+            "map50_95": 0.2749
+          },
+          "can": {
+            "precision": 0.4612,
+            "recall": 0.4717,
+            "f1": 0.4664,
+            "map50": 0.4401,
+            "map50_95": 0.283
+          },
+          "food_waste": {
+            "precision": 0.6195,
+            "recall": 0.5154,
+            "f1": 0.5627,
+            "map50": 0.5407,
+            "map50_95": 0.269
+          },
+          "garbage_pile": {
+            "precision": 0.6397,
+            "recall": 0.5496,
+            "f1": 0.5912,
+            "map50": 0.6247,
+            "map50_95": 0.4181
+          }
+        }
+      },
+      "scale_eval": {
+        "scale_metrics": {
+          "small": {
+            "tp": 6,
+            "fp": 4,
+            "fn": 100,
+            "gt_total": 106,
+            "pred_total": 9,
+            "precision": 0.6,
+            "recall": 0.0566,
+            "f1": 0.1034,
+            "approx_ap50": 0.0983
+          },
+          "medium": {
+            "tp": 135,
+            "fp": 68,
+            "fn": 183,
+            "gt_total": 318,
+            "pred_total": 198,
+            "precision": 0.665,
+            "recall": 0.4245,
+            "f1": 0.5182,
+            "approx_ap50": 0.4923
+          },
+          "large": {
+            "tp": 153,
+            "fp": 83,
+            "fn": 211,
+            "gt_total": 364,
+            "pred_total": 242,
+            "precision": 0.6483,
+            "recall": 0.4203,
+            "f1": 0.51,
+            "approx_ap50": 0.4845
+          }
+        },
+        "per_class": {
+          "plastic_bottle": {
+            "tp": 24,
+            "fp": 27,
+            "fn": 114,
+            "gt": 138
+          },
+          "plastic_bag": {
+            "tp": 13,
+            "fp": 15,
+            "fn": 60,
+            "gt": 73
+          },
+          "paper": {
+            "tp": 29,
+            "fp": 14,
+            "fn": 63,
+            "gt": 92
+          },
+          "can": {
+            "tp": 21,
+            "fp": 15,
+            "fn": 32,
+            "gt": 53
+          },
+          "food_waste": {
+            "tp": 185,
+            "fp": 74,
+            "fn": 205,
+            "gt": 390
+          },
+          "garbage_pile": {
+            "tp": 22,
+            "fp": 10,
+            "fn": 20,
+            "gt": 42
+          }
+        },
+        "latency_ms": 62.35,
+        "fps": 16.04,
+        "total_test_images": 150
+      }
+    },
+    "EXP-02-v8s-640": {
+      "exp_id": "EXP-02-v8s-640",
+      "base_model": "yolov8s.pt",
+      "epochs": 6,
+      "imgsz": 640,
+      "batch_size": 16,
+      "train_duration_s": 3589.8,
+      "weights_path": "C:\\Users\\avars\\Downloads\\AI Based Cleanliness Monitoring System\\training\\experiments\\v2\\runs\\EXP-02-v8s-640\\weights\\best.pt",
+      "val": {
+        "precision": 0.5344,
+        "recall": 0.4309,
+        "map50": 0.446,
+        "map50_95": 0.2787
+      },
+      "test": {
+        "precision": 0.5676,
+        "recall": 0.4348,
+        "f1": 0.4924,
+        "map50": 0.4705,
+        "map50_95": 0.2909,
+        "per_class": {
+          "plastic_bottle": {
+            "precision": 0.4859,
+            "recall": 0.2391,
+            "f1": 0.3205,
+            "map50": 0.2598,
+            "map50_95": 0.1306
+          },
+          "plastic_bag": {
+            "precision": 0.5649,
+            "recall": 0.3014,
+            "f1": 0.393,
+            "map50": 0.3695,
+            "map50_95": 0.2394
+          },
+          "paper": {
+            "precision": 0.5622,
+            "recall": 0.3587,
+            "f1": 0.4379,
+            "map50": 0.4046,
+            "map50_95": 0.2943
+          },
+          "can": {
+            "precision": 0.53,
+            "recall": 0.4528,
+            "f1": 0.4884,
+            "map50": 0.5047,
+            "map50_95": 0.3172
+          },
+          "food_waste": {
+            "precision": 0.6565,
+            "recall": 0.495,
+            "f1": 0.5644,
+            "map50": 0.5466,
+            "map50_95": 0.2683
+          },
+          "garbage_pile": {
+            "precision": 0.6059,
+            "recall": 0.7619,
+            "f1": 0.675,
+            "map50": 0.7379,
+            "map50_95": 0.4956
+          }
+        }
+      },
+      "scale_eval": {
+        "scale_metrics": {
+          "small": {
+            "tp": 7,
+            "fp": 5,
+            "fn": 99,
+            "gt_total": 106,
+            "pred_total": 10,
+            "precision": 0.5833,
+            "recall": 0.066,
+            "f1": 0.1186,
+            "approx_ap50": 0.1127
+          },
+          "medium": {
+            "tp": 144,
+            "fp": 73,
+            "fn": 174,
+            "gt_total": 318,
+            "pred_total": 216,
+            "precision": 0.6636,
+            "recall": 0.4528,
+            "f1": 0.5383,
+            "approx_ap50": 0.5114
+          },
+          "large": {
+            "tp": 172,
+            "fp": 106,
+            "fn": 192,
+            "gt_total": 364,
+            "pred_total": 281,
+            "precision": 0.6187,
+            "recall": 0.4725,
+            "f1": 0.5358,
+            "approx_ap50": 0.509
+          }
+        },
+        "per_class": {
+          "plastic_bottle": {
+            "tp": 32,
+            "fp": 30,
+            "fn": 106,
+            "gt": 138
+          },
+          "plastic_bag": {
+            "tp": 21,
+            "fp": 11,
+            "fn": 52,
+            "gt": 73
+          },
+          "paper": {
+            "tp": 30,
+            "fp": 12,
+            "fn": 62,
+            "gt": 92
+          },
+          "can": {
+            "tp": 25,
+            "fp": 30,
+            "fn": 28,
+            "gt": 53
+          },
+          "food_waste": {
+            "tp": 188,
+            "fp": 83,
+            "fn": 202,
+            "gt": 390
+          },
+          "garbage_pile": {
+            "tp": 27,
+            "fp": 18,
+            "fn": 15,
+            "gt": 42
+          }
+        },
+        "latency_ms": 134.6,
+        "fps": 7.43,
+        "total_test_images": 150
+      }
+    }
+  },
+  "best_experiment": "EXP-02-v8s-640",
+  "optimal_threshold": 0.25,
+  "threshold_sweep": [
+    {
+      "confidence_threshold": 0.2,
+      "precision": 0.5712,
+      "recall": 0.4327,
+      "f1": 0.4924,
+      "small_f1": 0.1148,
+      "medium_f1": 0.531,
+      "large_f1": 0.5271,
+      "latency_ms": 136.58,
+      "fps": 7.32
+    },
+    {
+      "confidence_threshold": 0.25,
+      "precision": 0.6371,
+      "recall": 0.4099,
+      "f1": 0.4988,
+      "small_f1": 0.1186,
+      "medium_f1": 0.5383,
+      "large_f1": 0.5358,
+      "latency_ms": 136.98,
+      "fps": 7.3
+    },
+    {
+      "confidence_threshold": 0.3,
+      "precision": 0.6916,
+      "recall": 0.3871,
+      "f1": 0.4963,
+      "small_f1": 0.087,
+      "medium_f1": 0.5419,
+      "large_f1": 0.5358,
+      "latency_ms": 134.83,
+      "fps": 7.42
+    },
+    {
+      "confidence_threshold": 0.35,
+      "precision": 0.724,
+      "recall": 0.3528,
+      "f1": 0.4744,
+      "small_f1": 0.0357,
+      "medium_f1": 0.5306,
+      "large_f1": 0.5123,
+      "latency_ms": 133.99,
+      "fps": 7.46
+    },
+    {
+      "confidence_threshold": 0.4,
+      "precision": 0.7663,
+      "recall": 0.3287,
+      "f1": 0.46,
+      "small_f1": 0.0183,
+      "medium_f1": 0.5378,
+      "large_f1": 0.4806,
+      "latency_ms": 144.55,
+      "fps": 6.92
+    },
+    {
+      "confidence_threshold": 0.45,
+      "precision": 0.8138,
+      "recall": 0.2995,
+      "f1": 0.4378,
+      "small_f1": 0.0183,
+      "medium_f1": 0.5217,
+      "large_f1": 0.4519,
+      "latency_ms": 138.78,
+      "fps": 7.21
+    },
+    {
+      "confidence_threshold": 0.5,
+      "precision": 0.8577,
+      "recall": 0.2754,
+      "f1": 0.4169,
+      "small_f1": 0.0187,
+      "medium_f1": 0.4898,
+      "large_f1": 0.4381,
+      "latency_ms": 142.84,
+      "fps": 7.0
+    },
+    {
+      "confidence_threshold": 0.55,
+      "precision": 0.8673,
+      "recall": 0.2487,
+      "f1": 0.3866,
+      "small_f1": 0.0187,
+      "medium_f1": 0.4665,
+      "large_f1": 0.3966,
+      "latency_ms": 139.33,
+      "fps": 7.18
+    },
+    {
+      "confidence_threshold": 0.6,
+      "precision": 0.8985,
+      "recall": 0.2246,
+      "f1": 0.3594,
+      "small_f1": 0.0187,
+      "medium_f1": 0.4296,
+      "large_f1": 0.3747,
+      "latency_ms": 133.42,
+      "fps": 7.5
+    },
+    {
+      "confidence_threshold": 0.65,
+      "precision": 0.9143,
+      "recall": 0.203,
+      "f1": 0.3323,
+      "small_f1": 0.0,
+      "medium_f1": 0.4126,
+      "large_f1": 0.3371,
+      "latency_ms": 136.13,
+      "fps": 7.35
+    },
+    {
+      "confidence_threshold": 0.7,
+      "precision": 0.9195,
+      "recall": 0.1739,
+      "f1": 0.2924,
+      "small_f1": 0.0,
+      "medium_f1": 0.375,
+      "large_f1": 0.2877,
+      "latency_ms": 135.0,
+      "fps": 7.41
+    }
+  ]
+}

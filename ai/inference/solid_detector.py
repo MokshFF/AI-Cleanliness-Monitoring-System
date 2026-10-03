@@ -81,14 +81,16 @@ class SolidWasteDetector:
         self,
         frame: np.ndarray,
         frame_index: Optional[int] = None,
+        confidence_threshold: Optional[float] = None,
     ) -> SolidFrameDetectionResult:
         """Runs detection on a single RGB/BGR numpy array and returns structured result."""
         start_time = time.perf_counter()
         h, w = frame.shape[:2]
 
+        conf_to_use = confidence_threshold if confidence_threshold is not None else self.confidence_threshold
         results = self.model.predict(
             source=frame,
-            conf=self.confidence_threshold,
+            conf=conf_to_use,
             device=self.device,
             verbose=False,
         )

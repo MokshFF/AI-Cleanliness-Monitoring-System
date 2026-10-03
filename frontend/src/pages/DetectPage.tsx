@@ -25,6 +25,7 @@ export const DetectPage: React.FC = () => {
   const [selectedCameraId, setSelectedCameraId] = useState<string>('');
   const [locationName, setLocationName] = useState<string>('');
   const [createIncident, setCreateIncident] = useState<boolean>(true);
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(0.25);
 
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -83,6 +84,7 @@ export const DetectPage: React.FC = () => {
       if (locationName) formData.append('location_name', locationName);
       formData.append('detection_mode', detectionMode);
       formData.append('create_incident', String(createIncident));
+      formData.append('confidence_threshold', String(confidenceThreshold));
 
       const response = await detectImage(formData);
       setResult(response);
@@ -217,6 +219,30 @@ export const DetectPage: React.FC = () => {
                 />
               </div>
 
+              {/* Confidence Threshold Slider */}
+              <div>
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                  <label>Confidence Threshold</label>
+                  <span className="font-mono text-blue-400 font-bold">
+                    {(confidenceThreshold * 100).toFixed(0)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="0.90"
+                  step="0.01"
+                  value={confidenceThreshold}
+                  onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
+                  className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                />
+                <div className="flex justify-between text-[10px] text-gray-500 mt-1">
+                  <span>1% (High Sensitivity)</span>
+                  <span>45% (Standard)</span>
+                  <span>90% (Strict)</span>
+                </div>
+              </div>
+
               {/* Auto Create Incident Checkbox */}
               <div className="pt-1">
                 <label className="flex items-center space-x-2 text-xs text-gray-300 cursor-pointer">
@@ -310,6 +336,11 @@ export const DetectPage: React.FC = () => {
                       src={result.annotated_image_url}
                       alt="AI Annotated Detections"
                       className="max-h-[420px] w-full object-contain"
+                      onError={(e) => {
+                        if (previewUrl) {
+                          (e.currentTarget as HTMLImageElement).src = previewUrl;
+                        }
+                      }}
                     />
                   ) : previewUrl ? (
                     <img
@@ -365,8 +396,13 @@ export const DetectPage: React.FC = () => {
                     </table>
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-gray-500 text-xs">
-                    No cleanliness violations detected above the confidence threshold.
+                  <div className="py-8 px-4 text-center space-y-2">
+                    <div className="text-gray-400 text-xs font-semibold">
+                      No cleanliness violations detected above {Math.round(confidenceThreshold * 100)}% confidence threshold.
+                    </div>
+                    <p className="text-[11px] text-gray-500 max-w-md mx-auto">
+                      Current weights are smoke-test models trained for pipeline validation. For real-world images, slide the <span className="text-blue-400 font-semibold">Confidence Threshold</span> down (e.g. to 1% – 5%) and click <span className="text-blue-400 font-semibold">Analyze Image</span> again to visualize lower-confidence detections.
+                    </p>
                   </div>
                 )}
               </Card>

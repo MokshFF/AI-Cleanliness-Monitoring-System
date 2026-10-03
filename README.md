@@ -28,11 +28,26 @@ A production-style AI surveillance platform for continuous monitoring of CCTV/IP
 
 ## Computer Vision & Video Ingestion Pipelines
 
-### 1. Solid Waste Detection (Phase 2)
+### 1. Solid Waste Detection (Real Model v2.0.0)
 - **Classes**: `plastic_bottle`, `plastic_bag`, `paper`, `can`, `food_waste`, `garbage_pile`
-- **Validation**: `python ai/datasets/validator.py`
-- **Training**: `python -m ai.training.train_solid --smoke-test --epochs 1 --batch 2 --imgsz 160 --device cpu`
-- **Evaluation**: `python -m ai.training.evaluate_solid --model models/solid/best.pt --data datasets/solid/dataset.yaml --split val`
+- **Dataset Preparation & Audit**:
+  ```bash
+  python ai/datasets/prepare_real_solid_dataset.py
+  ```
+- **Transfer Learning Training**:
+  ```bash
+  python training/run_experiment.py --model yolov8n.pt --epochs 15 --imgsz 416 --batch 16 --device cpu
+  ```
+- **Test Set Evaluation & Confusion Matrix**:
+  ```bash
+  python ai/training/evaluate_solid.py --model ai/models/weights/solid_waste_yolo.pt --data ai/configs/solid_dataset.yaml --split test
+  ```
+- **CCTV Robustness & Threshold Calibration**:
+  ```bash
+  python ai/training/cctv_robustness_test.py
+  ```
+- **Production Weights**: `ai/models/weights/solid_waste_yolo.pt` (Backup at `ai/models/weights/archive/solid_waste_yolo_smoke_v1.pt`)
+- **Documentation**: See `docs/real_garbage_model_training_report.md` and `docs/garbage_dataset_audit.md`.
 
 ### 2. Liquid Waste Segmentation & Affected-Area Analysis (Phase 3)
 - **Classes**: `liquid_spill`, `sewage_overflow`, `waterlogging`, `drain_overflow`

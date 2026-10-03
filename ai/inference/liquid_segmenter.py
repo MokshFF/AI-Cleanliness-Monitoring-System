@@ -132,6 +132,7 @@ class LiquidWasteSegmenter:
         frame: np.ndarray,
         frame_index: Optional[int] = None,
         roi: Optional[RegionOfInterest] = None,
+        confidence_threshold: Optional[float] = None,
     ) -> Tuple[LiquidFrameDetectionResult, np.ndarray]:
         """Runs instance segmentation on a single image/frame and computes affected liquid area.
         
@@ -144,9 +145,10 @@ class LiquidWasteSegmenter:
         active_roi = roi or self.default_roi
         roi_mask, monitored_pixels, roi_name = build_roi_mask((h, w), active_roi)
 
+        conf_to_use = confidence_threshold if confidence_threshold is not None else self.confidence_threshold
         results = self.model.predict(
             source=frame,
-            conf=self.confidence_threshold,
+            conf=conf_to_use,
             device=self.device,
             verbose=False,
         )

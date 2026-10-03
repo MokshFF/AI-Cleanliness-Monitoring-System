@@ -1,12 +1,11 @@
 # ==============================================================================
-# YOLOv8 / YOLOv11 Solid Waste Dataset Configuration
+# YOLO Solid Waste Dataset Configuration (GarbageDataset-v2)
 # ==============================================================================
-path: datasets/solid
+path: C:/Users/avars/Downloads/AI Based Cleanliness Monitoring System/datasets/solid
 train: images/train
 val: images/val
 test: images/test
 
-# Classes taxonomy (derived strictly from ai/configs/solid_classes.yaml)
 names:
   0: plastic_bottle
   1: plastic_bag

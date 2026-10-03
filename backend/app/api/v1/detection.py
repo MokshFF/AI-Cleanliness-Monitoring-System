@@ -67,6 +67,7 @@ async def detect_image(
     location_name: Optional[str] = Form(None, description="Optional physical location name"),
     detection_mode: str = Form("both", description="Detection mode: 'solid', 'liquid', or 'both'"),
     create_incident: bool = Form(True, description="Whether to automatically confirm and persist incidents"),
+    confidence_threshold: Optional[float] = Form(None, description="Optional confidence threshold (0.001 - 1.0)"),
     current_user: UserResponse = Depends(require_operator_or_admin),
     incident_repo: IncidentRepository = Depends(get_incident_repo),
 ):
@@ -122,7 +123,7 @@ async def detect_image(
     if mode in {"solid", "both"}:
         try:
             s_detector = get_solid_detector()
-            solid_result = s_detector.predict_frame(mat)
+            solid_result = s_detector.predict_frame(mat, confidence_threshold=confidence_threshold)
             if solid_result and solid_result.has_violations:
                 annotated_mat = s_detector.annotate_frame(annotated_mat, solid_result)
                 for det in solid_result.detections:
@@ -142,7 +143,7 @@ async def detect_image(
     if mode in {"liquid", "both"}:
         try:
             l_segmenter = get_liquid_segmenter()
-            res_val = l_segmenter.predict_frame(mat)
+            res_val = l_segmenter.predict_frame(mat, confidence_threshold=confidence_threshold)
             liquid_result = res_val[0] if isinstance(res_val, tuple) else res_val
             if liquid_result and liquid_result.has_violations:
                 annotated_mat = l_segmenter.annotate_frame(annotated_mat, liquid_result)
@@ -241,7 +242,6 @@ async def detect_image(
 @router.get("/annotated/{filename}")
 async def get_annotated_image(
     filename: str,
-    current_user: UserResponse = Depends(require_operator_or_admin),
 ):
     """Securely streams annotated detection images with path traversal protection."""
     annotated_dir = (settings.BASE_DIR / "storage" / "annotated").resolve()

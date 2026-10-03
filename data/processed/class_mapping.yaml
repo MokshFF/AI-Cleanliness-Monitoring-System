@@ -1,0 +1,66 @@
+# ==============================================================================
+# Solid Waste Dataset Class Mapping Configuration
+# Maps source dataset classes to application target taxonomy
+# ==============================================================================
+dataset_name: "Garbage Classification 3 (GC1)"
+source_repository: "https://universe.roboflow.com/material-identification/garbage-classification-3"
+huggingface_hub: "keremberke/garbage-object-detection"
+license: "CC BY 4.0"
+
+target_classes:
+  0: plastic_bottle
+  1: plastic_bag
+  2: paper
+  3: can
+  4: food_waste
+  5: garbage_pile
+
+source_to_target:
+  # Class 0: biodegradable -> food_waste
+  biodegradable:
+    target_id: 4
+    target_name: food_waste
+    rationale: "Organic food scraps, fruit/vegetable peels, decomposing food leftovers"
+    mapped: true
+
+  # Class 1: cardboard -> paper
+  cardboard:
+    target_id: 2
+    target_name: paper
+    rationale: "Cardboard boxes, shipping cartons, and paper packaging"
+    mapped: true
+
+  # Class 2: glass -> EXCLUDED
+  glass:
+    target_id: null
+    target_name: null
+    rationale: "Glass containers and bottles are excluded because glass is outside the 6 target classes"
+    mapped: false
+
+  # Class 3: metal -> can
+  metal:
+    target_id: 3
+    target_name: can
+    rationale: "Metal beverage cans, food tins, aluminium drink containers"
+    mapped: true
+
+  # Class 4: paper -> paper
+  paper:
+    target_id: 2
+    target_name: paper
+    rationale: "Office paper, newspapers, flyers, wrapping paper"
+    mapped: true
+
+  # Class 5: plastic -> partitioned by geometry / aspect ratio
+  plastic:
+    target_id: 0
+    target_name: plastic_bottle
+    rationale: "Elongated plastic containers (bottles, cups) mapped to plastic_bottle; flat/crumpled plastic sheets mapped to plastic_bag"
+    mapped: true
+
+  # Derived cluster category: garbage_pile
+  multi_waste_cluster:
+    target_id: 5
+    target_name: garbage_pile
+    rationale: "Dense clusters of 4+ overlapping waste items covering a significant ground area"
+    mapped: true

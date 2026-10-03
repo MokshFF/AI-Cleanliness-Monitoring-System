@@ -88,7 +88,7 @@ class Settings(BaseSettings):
     LIQUID_MODEL_PATH: str = "./ai/models/weights/liquid_waste_yolo_seg.pt"
 
     # Solid Waste Tracking & Validation (Phase 5)
-    SOLID_MIN_CONFIDENCE: float = 0.45
+    SOLID_MIN_CONFIDENCE: float = 0.35
     SOLID_MIN_CONSECUTIVE_FRAMES: int = 5
     SOLID_TRACK_GRACE_FRAMES: int = 10
     SOLID_TRACK_IOU_THRESHOLD: float = 0.30
@@ -105,7 +105,7 @@ class Settings(BaseSettings):
     INCIDENT_COOLDOWN_SECONDS: int = 180
 
     # Backwards-compatibility aliases for Phase 1 tests
-    SOLID_CONFIDENCE_THRESHOLD: float = 0.45
+    SOLID_CONFIDENCE_THRESHOLD: float = 0.35
     LIQUID_CONFIDENCE_THRESHOLD: float = 0.40
     SOLID_TEMPORAL_CONFIRMATION_FRAMES: int = 5
     LIQUID_TEMPORAL_CONFIRMATION_FRAMES: int = 4
